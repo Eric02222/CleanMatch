@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:senai@127.0.0.1:3306/clinica_dever"
+}
+
+//referencia
+model Usuario {
+  id        Int         @id @default(autoincrement())
+  nome      String
+  email     String      @unique
+  senha     String
+  cargo     String
+  Protuario Protuario[]
+  Consulta  Consulta[]
+}
