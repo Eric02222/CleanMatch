@@ -35,3 +35,4 @@ Será um aplicativo para facilitar o encontro de pessoas que prestam serviço de
 -jsonwebtoken  
 -bcrypt  
 -dotenv  
+-nodemon  
