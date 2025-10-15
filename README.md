@@ -3,10 +3,11 @@
 Trabalho da Situação de Aprendizagem do segundo semestre do curso técnico de Desenvolvimento de Sistemas do SENAI.
 
 # MEMBROS DO PROJETO:
-- [Nicolas Corrêa Gubert](https://github.com/correagubert);
-- [Vitor Carlos Souza da Rocha Pinto](https://github.com/OracleThe61);
 - [Eric Mara de Oliveira](https://github.com/Eric02222);
+- [Vitor Carlos Souza da Rocha Pinto](https://github.com/OracleThe61);
+- [Bryan Demis Alves de Andrade](https://github.com/brryan64d);
 - [Francisco Ulisses](https://github.com/ulissessantos95);
+- [Nicolas Corrêa Gubert](https://github.com/correagubert);
   
 # TEMA: Aplicativo de serviço de limpeza
 Será um aplicativo para facilitar o encontro de pessoas que prestam serviço de limpeza, além de facilitar também a locação do serviço.
@@ -21,11 +22,17 @@ Será um aplicativo para facilitar o encontro de pessoas que prestam serviço de
 -Filtrar prestadores de serviço próximo a sua região.  
 -Capacidade de solicitação dos clientes para prestadores de serviços atenderem.  
 
-# Comando para intalações de bibliotecas obrigatorias: 
+# Comando para intalações de bibliotecas obrigatorias front end: 
 -React-Toastify: npm i --save react-toastify  
--react-router-dom: npm install react-router-dom
+-react-dom
+-react-router
 -tailwind: npm install tailwindcss @tailwindcss/vite  
 -Jest: npm install --save-dev jest  
+-react-icons
+
+# Comando para intalações de bibliotecas obrigatorias back end: 
 -Express: npm install express --save  
--Nodemon: npm install nodemon -D  
 -Prisma: npx prisma init --db  
+-jsonwebtoken
+-bcrypt
+-dotenv
