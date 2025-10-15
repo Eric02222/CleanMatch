@@ -1,5 +1,4 @@
-# senaiSALimpeza
-
+# CleanMatch
 Trabalho da Situação de Aprendizagem do segundo semestre do curso técnico de Desenvolvimento de Sistemas do SENAI.
 
 # MEMBROS DO PROJETO:
