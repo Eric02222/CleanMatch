@@ -23,8 +23,8 @@ Será um aplicativo para facilitar o encontro de pessoas que prestam serviço de
 
 # Comando para intalações de bibliotecas obrigatorias front end: 
 -React-Toastify: npm i --save react-toastify  
--react-dom
--react-router
+-react-dom  
+-react-router  
 -tailwind: npm install tailwindcss @tailwindcss/vite  
 -Jest: npm install --save-dev jest  
 -react-icons
@@ -32,6 +32,6 @@ Será um aplicativo para facilitar o encontro de pessoas que prestam serviço de
 # Comando para intalações de bibliotecas obrigatorias back end: 
 -Express: npm install express --save  
 -Prisma: npx prisma init --db  
--jsonwebtoken
--bcrypt
--dotenv
+-jsonwebtoken  
+-bcrypt  
+-dotenv  
