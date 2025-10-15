@@ -32,6 +32,7 @@ Será um aplicativo para facilitar o encontro de pessoas que prestam serviço de
 # Comando para intalações de bibliotecas obrigatorias back end: 
 -Express: npm install express --save  
 -Prisma: npx prisma init --db  
+-Jest: npm install --save-dev jest   
 -jsonwebtoken  
 -bcrypt  
 -dotenv  
