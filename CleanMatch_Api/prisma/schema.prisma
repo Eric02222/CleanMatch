@@ -4,16 +4,37 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:senai@127.0.0.1:3306/clinica_dever"
+  url      = "mysql://root:senai@127.0.0.1:3306/cleanMatch"
 }
 
 //referencia
 model Usuario {
-  id        Int         @id @default(autoincrement())
-  nome      String
-  email     String      @unique
-  senha     String
-  cargo     String
-  Protuario Protuario[]
-  Consulta  Consulta[]
+  id                  Int    @id @default(autoincrement())
+  nome                String
+  email               String @unique
+  senha               String
+  contato             String
+  tipo_conta          String
+  cep                 String
+  estado              String
+  cidade              String
+  valor_min           String
+  valor_max           String
+  cargaHoraria_inicio String
+  cargaHoraria_fim    String
+  descricao           String
+  foto_perfil         String
+
+  @@map("usuario")
+}
+
+
+model token {
+  id        Int      @id @default(autoincrement())
+  token     String
+  type      String
+  expiresAt DateTime
+  revoked   Boolean @default(value: false)
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
 }
