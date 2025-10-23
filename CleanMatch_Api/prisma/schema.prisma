@@ -10,20 +10,20 @@ datasource db {
 //referencia
 model Usuario {
   id                  Int    @id @default(autoincrement())
-  nome                String
-  email               String @unique
+  nome                String @db.VarChar(100)
+  email               String @unique @db.VarChar(100)
   senha               String
-  contato             String
-  tipo_conta          String
-  cep                 String
+  contato             int
+  tipo_conta          Role     @default(Cliente)
+  cep                 int
   estado              String
   cidade              String
-  valor_min           String
-  valor_max           String
-  cargaHoraria_inicio String
-  cargaHoraria_fim    String
-  descricao           String
-  foto_perfil         String
+  valor_min           int
+  valor_max           int
+  cargaHoraria_inicio DateTime?
+  cargaHoraria_fim    DateTime?
+  descricao           String @db.VarChar(500)
+  foto_perfil         String @db.VarChar(150)
 
   @@map("usuario")
 }
@@ -37,4 +37,9 @@ model token {
   revoked   Boolean @default(value: false)
   usuarioId Int
   usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+enum Role {
+  Cliente
+  Prestador/a de Serviço
 }
