@@ -4,7 +4,6 @@ import Botao_logout from './Botao_logout.jsx'
 import Botao_login from "./Botao_login.jsx"
 import Botao_cadastro from "./Botao_cadastro.jsx"
 import { useContext, useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom';
 import { GlobalContext } from "../contexts/GlobalContext"
 import axios from 'axios';
 import UserIcon from '../assets/icons/user-icon.svg';
@@ -12,7 +11,6 @@ import UserIcon from '../assets/icons/user-icon.svg';
 export function Header() {
   const { usuarioLogado, setUsuarioLogado } = useContext(GlobalContext)
   const [fotoPerfil, setfotoPerfil] = useState(null)
-   const navigate = useNavigate()
 
   const defaultAvatar = UserIcon;
 
