@@ -12,6 +12,7 @@ import { Cadastro } from "../pages/Cadastro/Cadastro.jsx";
 import PrivateRoute from './Components/PrivateRouter/PrivateRouter.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import Perfil from './pages/Perfil/Perfil.jsx'
+import { Header } from './layout/Header/Header.jsx';
 
 const router = createBrowserRouter([
   {
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
 
     element: (
       <PrivateRoute>
-
+        <Header/>
       </PrivateRoute>
     ),
     children:[

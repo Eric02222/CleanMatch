@@ -3,9 +3,9 @@ import './Cadastro.css'
 import Navbar from "../components/Navbar"
 import axios from 'axios';
 import { validarEmail } from '../components/Formarter';
-import { Route, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function Cadastro() {
@@ -14,57 +14,57 @@ function Cadastro() {
     const [senha, setSenha] = useState('')
     const [vaSenha, setVaSenha] = useState('')
     const [tipoConta, setTipoConta] = useState('Cliente')
-    const [usuarios, setUsuarios] = useState([])
+
+    const [isPasswordMatch, SetIsPasswordMatch] = useState(true)
+    const [isSaving, SetIsSaving] = useState(false)
+
     const navigate = useNavigate();
 
-    const fetchUsuarios = async () => {
-        try {
-            const response = await axios.get('http://localhost:3000/usuarios');
-            setUsuarios(response.data);
-        } catch (error) {
-            console.error('Erro ao buscar usuarios:', error);
+    const ispassordValid = () => senha.length >= 8 && senha === vaSenha
+
+
+
+    const cadastro = async (e) => {
+        e.preventDefault()
+
+        if (!ispassordValid()) {
+            SetIsPasswordMatch(false)
+            return
         }
-    };
 
-    useEffect(() => {
-        fetchUsuarios();
-    }, []);
+        SetIsSaving(true)
 
-
-    const cadastro = async () => {
         try {
-            const usuarioEncontrado = usuarios.find(usuario => usuario.email === email);
 
-            if (!nome || !email || !senha || !vaSenha || !validarEmail(email)) {
-                toast.error("Preencha todos os campos corretamente");
-            } else if (usuarioEncontrado) {
-                toast.warning("Usuario Ja Cadastrado");
-            } else if (senha != vaSenha) {
-                toast.error("A Senhas não conferem");
-            } else {
+            await axios.post('http://localhost:3000/auth/register', {
+                nome: nome,
+                email: email,
+                senha: senha,
+                tipo_conta: tipoConta
+            })
 
-                const usuario = {
-                    nome: nome,
-                    email: email,
-                    senha: senha,
-                    tipo_conta: tipoConta
-                }
-                toast.success("Cadastro efetuado com sucesso");
+            resetForm()
+            SetIsSaving(false)
+            toast.success('Usuario criado com sucesso!', {
+                autoClose: 3000,
+                hideProgressBar: true,
+                pauseOnHover: false
+            })
 
-                const response = await axios.post('http://localhost:3000/usuarios', usuario);
-                if (response.status === 201) {
-
-                    fetchUsuarios();
-                    limparForm();
-                    setTimeout(() => {
-                        navigate('/Login');
-                    }, 800);
-                }
-
-            }
+            fetchUsuarios();
+            limparForm();
+            setTimeout(() => {
+                navigate('/Login');
+            }, 800);
 
         } catch (error) {
-            console.error('Erro ao adicionar usuarios:', error);
+            console.error("Erro ao criar usuario", error)
+            SetIsSaving(false)
+            toast.error('Erro ao criar usuario', {
+                autoClose: 3000,
+                hideProgressBar: true,
+                pauseOnHover: false
+            })
         }
     }
 
@@ -83,20 +83,24 @@ function Cadastro() {
                 <h1 className='titulo_cadastro'>Cadastro</h1>
             </div>
 
-            <div className='container_conteudos_cadastro'>
+            <form onSubmit={cadastro} className='container_conteudos_cadastro'>
                 <div className='inputs-cadastro'>
 
                     <label htmlFor="input-email" className='label-emailCad'>Nome</label>
-                    <input type="text" className='input-email' value={nome} onChange={(event) => setNome(event.target.value)} />
+                    <input type="text" className='input-email' value={nome} onChange={(event) => setNome(event.target.value)} required />
 
                     <label htmlFor="input-email" className='label-emailCad'>Email</label>
-                    <input type="text" className='input-email' value={email} onChange={(event) => setEmail(event.target.value)} />
+                    <input type="text" className='input-email' value={email} onChange={(event) => setEmail(event.target.value)} required />
 
                     <label htmlFor="input-senha" className='label-senhaCad'>Senha</label>
-                    <input type="password" className='input-senha' value={senha} onChange={(event) => setSenha(event.target.value)} />
+                    <input type="password" className='input-senha' value={senha} onChange={(event) => setSenha(event.target.value)} required minLength={8}/>
 
                     <label htmlFor="input-coSenha" className='label-coSenhaCad'>Confirmar Senha</label>
-                    <input type="password" className='input-coSenha' value={vaSenha} onChange={(event) => setVaSenha(event.target.value)} />
+                    <input type="password" className='input-coSenha' value={vaSenha} onChange={(event) => setVaSenha(event.target.value)} required minLength={8}/>
+
+                    {!isPasswordMatch && (
+                        <p className='text-red-500 text-sm mt-1 text-center'>Senhas não correspodem</p>
+                    )}
 
                 </div>
 
@@ -116,13 +120,13 @@ function Cadastro() {
 
 
                 <div className='irPg_Login'>
-                    <label onClick={() => navigate('/Login')}>Já tem uma conta?</label>
+                    <label type="submit" onClick={() => navigate('/Login')}>Já tem uma conta?</label>
                 </div>
 
                 <div className='container_bnt_cadastro'>
-                    <button onClick={cadastro} className='botao-cadastro'>Cadastrar</button>
+                    <button type="submit" disabled={isSaving} className='botao-cadastro'>{isSaving ? 'Salvando' : 'Cadastrar'}</button>
                 </div>
-            </div>
+            </form>
 
         </div>
     )

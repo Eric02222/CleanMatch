@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 
-
-
 function bnt_Logout() {
     const {logout} = useAuth
    
@@ -12,7 +10,6 @@ function bnt_Logout() {
 
     const deslogar = () => {
             logout
-            setUsuarioLogado(null)
             toast.success("Voce saiu de sua conta");
        
     };

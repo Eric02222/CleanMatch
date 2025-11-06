@@ -15,14 +15,15 @@ export const AuthProvider = ({children}) => {
         }
     }, [])
 
-    const login = (email) => {
+    const login = (email, token) => {
         localStorage.setItem("email", email)
         localStorage.setItem("token", token)
-        setUser({email})
+        setUser({email, token})
     }
     
     const logout = () => {
         localStorage.removeItem("email")
+        localStorage.removeItem("token")
         setUser("")
     }
 

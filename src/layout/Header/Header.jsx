@@ -7,6 +7,7 @@ import { useContext, useState, useEffect } from 'react'
 import { GlobalContext } from "../contexts/GlobalContext"
 import axios from 'axios';
 import UserIcon from '../assets/icons/user-icon.svg';
+import { Outlet } from "react-router"
 
 export function Header() {
   const { usuarioLogado, setUsuarioLogado } = useContext(GlobalContext)
@@ -40,37 +41,40 @@ export function Header() {
 
   return (
     <div className="container_navbar">
-      <nav className="navbar">
-        <div>
-          <Link to="/">Home</Link>
-        </div>
+      <main>
+        <header className="navbar">
+          <div>
+            <Link to="/">Home</Link>
+          </div>
 
 
-        <div className="opcoes_perfil">
-          {usuarioLogado ? (
-            <Botao_logout />
+          <div className="opcoes_perfil">
+            {usuarioLogado ? (
+              <Botao_logout />
 
-          ) :
-            (
-              <>
-                <Botao_login />
-                <Botao_cadastro />
-              </>
+            ) :
+              (
+                <>
+                  <Botao_login />
+                  <Botao_cadastro />
+                </>
+              )}
+            {usuarioLogado ? (
+              <div className="container_perfil">
+                <img className="inconePerfil" src={fotoPerfil ? fotoPerfil.foto : defaultAvatar} alt="Avatar do Perfil" />
+                <Link to="/Perfil">Perfil</Link>
+              </div>
+            ) : (
+              <label htmlFor=""></label>
             )}
-          {usuarioLogado ? (
-            <div className="container_perfil">
-              <img className="inconePerfil"  src={fotoPerfil ? fotoPerfil.foto : defaultAvatar} alt="Avatar do Perfil" />
-              <Link to="/Perfil">Perfil</Link>
-            </div>
-          ) : (
-            <label htmlFor=""></label>
-          )}
+          </div>
+        </header>
 
+        <section>
+          <Outlet />
+        </section>
+      </main>
 
-        </div>
-
-
-      </nav>
 
     </div>
   )
