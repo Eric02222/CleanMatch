@@ -1,9 +1,10 @@
 import express from 'express';
 import cors from "cors";
-import { usuarioRouter } from './routes/usuarioRoute';
-import { auth } from './middleware/auth';
+import { usuarioRouter } from './routes/usuarioRoute.js';
+import { auth } from './middleware/auth.js';
+import { authRouter } from './routes/authRoutes.js';
 
-const app = express();
+export const app = express();
 
 app.use(cors()); 
 app.use(express.json());

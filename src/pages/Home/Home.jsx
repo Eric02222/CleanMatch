@@ -1,12 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import Navbar from "../components/Navbar"
-import './Home.css'
-import { ToastContainer, toast } from 'react-toastify';
-import { formatPhoneNumber, formatCepNumber, formatTime } from '../components/Formarter';
-import { GlobalContext } from '../contexts/GlobalContext';
-import Aviso from '../components/Aviso';
-import UserIcon from '../assets/icons/user-icon.svg';
+import { formatPhoneNumber, formatCepNumber, formatTime } from '../../Components/Formarte/Formarte.js';
+import { useAuth } from "../../contexts/AuthContext.jsx"
+import Aviso from '../../components/Aviso/Aviso.jsx';
+// import UserIcon from '../assets/icons/user-icon.svg';
 
 
 function Home() {
@@ -14,7 +11,7 @@ function Home() {
     const [usuarios, setUsuarios] = useState([]);
     const [selectedCard, setSelectedCard] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const { usuarioLogado, setUsuarioLogado } = useContext(GlobalContext);
+    const { user } = useAuth();
     const [mostrarAviso, setMostrarAviso] = useState(false);
     const [fotoPerfil, setfotoPerfil] = useState({});
     const [paginaAtual, setPaginaAtual] = useState(1);
@@ -59,8 +56,8 @@ function Home() {
     }, []);
 
     useEffect(() => {
-        if (usuarioLogado && usuarioLogado.tipo_conta === 'Prestador/a de Serviço') {
-            const { cargaHoraria_inicio, cargaHoraria_fim, valor_min, valor_max, cep, estado, cidade, rua, contato } = usuarioLogado;
+        if (user && user.tipo_conta === 'Prestador/a de Serviço') {
+            const { cargaHoraria_inicio, cargaHoraria_fim, valor_min, valor_max, cep, estado, cidade, rua, contato } = user;
 
             const informacoesIncompletas =
                 !cargaHoraria_inicio ||
@@ -74,10 +71,10 @@ function Home() {
                 !contato;
 
             setMostrarAviso(informacoesIncompletas);
-        } else if (!usuarioLogado) {
+        } else if (!user) {
             setMostrarAviso(false);
         }
-    }, [usuarioLogado]);
+    }, [user]);
 
 
     useEffect(() => {
@@ -121,7 +118,7 @@ function Home() {
             user.cidade &&
             user.rua &&
             user.contato;
-        if (!informacoesCompletas && !(usuarioLogado && usuarioLogado.id === user.id)) {
+        if (!informacoesCompletas && !(user && user.id === user.id)) {
             return false;
         }
 
@@ -149,9 +146,8 @@ function Home() {
 
     return (
         <div className="container_home">
-            <Navbar className='navbar' />
 
-            {usuarioLogado && mostrarAviso && (
+            {user && mostrarAviso && (
                 <div className='aviso'>
                     <Aviso />
                 </div>

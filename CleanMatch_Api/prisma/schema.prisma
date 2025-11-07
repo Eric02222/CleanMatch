@@ -4,42 +4,42 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:senai@127.0.0.1:3306/cleanMatch"
+  url      = "mysql://root:861391@127.0.0.1:3307/cleanMatch"
 }
 
 //referencia
 model Usuario {
-  id                  Int    @id @default(autoincrement())
-  nome                String @db.VarChar(100)
-  email               String @unique @db.VarChar(100)
+  id                  Int       @id @default(autoincrement())
+  nome                String    @db.VarChar(100)
+  email               String    @unique @db.VarChar(100)
   senha               String
-  contato             int
-  tipo_conta          Role     @default(Cliente)
-  cep                 int
+  contato             Int
+  tipo_conta          UserRole  @default(CLIENTE)
+  cep                 Int
   estado              String
   cidade              String
-  valor_min           int
-  valor_max           int
+  valor_min           Int
+  valor_max           Int
   cargaHoraria_inicio DateTime?
   cargaHoraria_fim    DateTime?
-  descricao           String @db.VarChar(500)
-  foto_perfil         String @db.VarChar(150)
+  descricao           String    @db.VarChar(500)
+  foto_perfil         String    @db.VarChar(150)
+  tokens              token[]
 
   @@map("usuario")
 }
-
 
 model token {
   id        Int      @id @default(autoincrement())
   token     String
   type      String
   expiresAt DateTime
-  revoked   Boolean @default(value: false)
+  revoked   Boolean  @default(value: false)
   usuarioId Int
   usuario   Usuario  @relation(fields: [usuarioId], references: [id])
 }
 
-enum Role {
-  Cliente
-  Prestador/a de Serviço
+enum UserRole {
+  CLIENTE              @map("Cliente")
+  PRESTADOR_DE_SERVICO @map("Prestador/a de Serviço")
 }

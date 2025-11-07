@@ -1,4 +1,4 @@
-import AvisoIcon from '../assets/icons/aviso-icon.svg';
+// import AvisoIcon from '../assets/icons/aviso-icon.svg';
 
 function Aviso() {
   return (

@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import './Cadastro.css'
-import Navbar from "../components/Navbar"
+import { useState, useEffect } from 'react'
 import axios from 'axios';
-import { validarEmail } from '../components/Formarter';
 import { useNavigate } from 'react-router-dom';
 
 import { toast } from 'react-toastify';
@@ -77,8 +74,6 @@ function Cadastro() {
 
     return (
         <div className='container-cadastro'>
-            <Navbar />
-
             <div>
                 <h1 className='titulo_cadastro'>Cadastro</h1>
             </div>

@@ -1,22 +1,22 @@
-import { useContext, useEffect, useState } from 'react';
-import { GlobalContext } from '../contexts/GlobalContext';
-import UserIcon from '../assets/icons/user-icon.svg';
+import { useEffect, useState } from 'react';
+import { useAuth } from "../../contexts/AuthContext"
+// import UserIcon from '../assets/icons/user-icon.svg';
 import axios from 'axios';
 
 function Foto_de_perfil() {
     const [fotoPerfil, setfotoPerfil] = useState(null)
     const [imagemKey, setImagemKey] = useState(Date.now());
-    const { usuarioLogado } = useContext(GlobalContext);
+    const { user } = useAuth()
 
     const defaultAvatar = UserIcon;
 
     const fetchfotosPerfil = async () => {
-        if (!usuarioLogado || !usuarioLogado.id) return;
+        if (!user || !user.id) return;
 
         try {
             const response = await axios.get('http://localhost:3000/foto_perfil');
             const todasAsFotos = response.data;
-            const fotoDoUsuario = todasAsFotos.find(foto => foto.usuarios_id === usuarioLogado.id);
+            const fotoDoUsuario = todasAsFotos.find(foto => foto.usuarios_id === user.id);
 
             if (fotoDoUsuario) {
                 setfotoPerfil(fotoDoUsuario);
@@ -32,7 +32,7 @@ function Foto_de_perfil() {
 
     useEffect(() => {
         fetchfotosPerfil();
-    }, [usuarioLogado]);
+    }, [user]);
 
 
     const enviar_foto = async (e) => {
@@ -47,7 +47,7 @@ function Foto_de_perfil() {
 
             const foto = {
                 link_foto: urlFoto,
-                usuarios_id: usuarioLogado.id
+                usuarios_id: user.id
             }
             try {
 

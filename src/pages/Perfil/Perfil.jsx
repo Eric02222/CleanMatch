@@ -1,19 +1,17 @@
-import React, { useContext, useEffect, useState, useCallback } from 'react';
-import './Perfil.css';
-import { GlobalContext } from '../contexts/GlobalContext';
-import Navbar from '../components/Navbar';
-import { formatPhoneNumber, formatCepNumber, validarEmail } from '../components/Formarter';
+import { useEffect, useState, useCallback } from 'react';
+import { useAuth } from "../../contexts/AuthContext"
+import { formatPhoneNumber, formatCepNumber, validarEmail } from '../../Components/Formarte/Formarte.js';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Foto_de_perfil from '../components/Foto_de_perfil';
+import Foto_de_perfil from '../../Components/FotoPerfil/FotoPerfil.jsx';
 
 function Perfil() {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const { usuarioLogado, setUsuarioLogado } = useContext(GlobalContext);
+  const { user } = useAuth()
   const navigate = useNavigate();
   const [accountData, setAccountData] = useState({});
   const [originalAccountData, setOriginalAccountData] = useState({});
@@ -23,20 +21,20 @@ function Perfil() {
 
 
   useEffect(() => {
-    if (usuarioLogado) {
-      setAccountData(usuarioLogado);
-      setOriginalAccountData(usuarioLogado);
+    if (user) {
+      setAccountData(user);
+      setOriginalAccountData(user);
       console.log(accountData)
 
-      setDisplayContato(formatPhoneNumber(usuarioLogado.contato || ''));
-      setDisplayCep(formatCepNumber(usuarioLogado.cep || ''));
+      setDisplayContato(formatPhoneNumber(user.contato || ''));
+      setDisplayCep(formatCepNumber(user.cep || ''));
     }
-  }, [usuarioLogado]);
+  }, [user]);
 
 
   // ativar caso houver mudança de desing para acesso ao perfil
   // useEffect(() => {
-  //   if (!usuarioLogado) {
+  //   if (!user) {
   //     toast.warning('Você precisa estar logado para acessar esta página.');
   //     navigate('/');
   //   }
@@ -144,9 +142,9 @@ function Perfil() {
     try {
 
       if (validarEmail(accountData.email)) {
-        await axios.put(`http://localhost:3000/usuarios/${usuarioLogado.id}`, accountData);
+        await axios.put(`http://localhost:3000/usuarios/${user.id}`, accountData);
 
-        setUsuarioLogado(accountData);
+        setuser(accountData);
         setIsEditing(false);
         setShowSaveModal(false);
 
@@ -172,9 +170,9 @@ function Perfil() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/usuarios/${usuarioLogado.id}`);
+      await axios.delete(`http://localhost:3000/usuarios/${user.id}`);
 
-      setUsuarioLogado(null);
+      setuser(null);
       setShowDeleteModal(false);
       navigate('/');
       return toast.success('Conta excluída com sucesso!');
@@ -205,7 +203,6 @@ function Perfil() {
 
   return (
     <div className="container-perfil">
-      <Navbar />
       <div className="perfil-dados">
         <div className="img_perfil">
           <Foto_de_perfil />

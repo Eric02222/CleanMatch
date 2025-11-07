@@ -1,27 +1,26 @@
 import { Link } from "react-router-dom"
-import './Navbar.css'
-import Botao_logout from './Botao_logout.jsx'
-import Botao_login from "./Botao_login.jsx"
-import Botao_cadastro from "./Botao_cadastro.jsx"
-import { useContext, useState, useEffect } from 'react'
-import { GlobalContext } from "../contexts/GlobalContext"
+import Botao_logout from "../../Components/BotaoLogout/BotaoLogout.jsx"
+import Botao_login from "../../Components/BotaoLogin/BotaoLogin.jsx"
+import Botao_cadastro from "../../Components/BotaoCadastro/BotaoCadastro.jsx"
+import { useState, useEffect } from 'react'
+import { useAuth } from "../../contexts/AuthContext.jsx"
 import axios from 'axios';
-import UserIcon from '../assets/icons/user-icon.svg';
+// import UserIcon from '../assets/icons/user-icon.svg';
 import { Outlet } from "react-router"
 
 export function Header() {
-  const { usuarioLogado, setUsuarioLogado } = useContext(GlobalContext)
+  const { user } = useAuth()
   const [fotoPerfil, setfotoPerfil] = useState(null)
 
   const defaultAvatar = UserIcon;
 
   const fetchfotosPerfil = async () => {
-    if (!usuarioLogado || !usuarioLogado.id) return;
+    if (!user || !user.id) return;
 
     try {
       const response = await axios.get('http://localhost:3000/foto_perfil');
       const todasAsFotos = response.data;
-      const fotoDoUsuario = todasAsFotos.find(foto => foto.usuarios_id === usuarioLogado.id);
+      const fotoDoUsuario = todasAsFotos.find(foto => foto.usuarios_id === user.id);
 
       if (fotoDoUsuario) {
         setfotoPerfil(fotoDoUsuario);
@@ -49,7 +48,7 @@ export function Header() {
 
 
           <div className="opcoes_perfil">
-            {usuarioLogado ? (
+            {user ? (
               <Botao_logout />
 
             ) :
@@ -59,7 +58,7 @@ export function Header() {
                   <Botao_cadastro />
                 </>
               )}
-            {usuarioLogado ? (
+            {user ? (
               <div className="container_perfil">
                 <img className="inconePerfil" src={fotoPerfil ? fotoPerfil.foto : defaultAvatar} alt="Avatar do Perfil" />
                 <Link to="/Perfil">Perfil</Link>
