@@ -1,21 +1,23 @@
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
 
 function bnt_Logout() {
-    const {logout} = useAuth
-   
-    const navigate = useNavigate()
+    const { logout } = useAuth
 
     const deslogar = () => {
-            logout
-            toast.success("Voce saiu de sua conta");
-       
+
+        logout
+        toast.success("Voce saiu de sua conta" , {
+                autoClose: 3000,
+                hideProgressBar: true,
+                pauseOnHover: false
+            })
+
     };
 
     return (
-        <div onClick={deslogar()} className='bnt_logout'>Logout</div>
+        <button onClick={deslogar()} className='bnt_logout'>Logout</button>
     )
 }
 

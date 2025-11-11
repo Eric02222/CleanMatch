@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-function Cadastro() {
+export function Cadastro() {
     const [nome, setNome] = useState('')
     const [email, setEmail] = useState('')
     const [senha, setSenha] = useState('')
@@ -33,7 +33,7 @@ function Cadastro() {
 
         try {
 
-            await axios.post('http://localhost:3000/auth/register', {
+            await axios.post('http://localhost:4000/auth/register', {
                 nome: nome,
                 email: email,
                 senha: senha,
@@ -127,4 +127,3 @@ function Cadastro() {
     )
 }
 
-export default Cadastro

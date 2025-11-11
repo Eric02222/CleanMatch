@@ -12,7 +12,7 @@ export function Header() {
   const { user } = useAuth()
   const [fotoPerfil, setfotoPerfil] = useState(null)
 
-  const defaultAvatar = UserIcon;
+  // const defaultAvatar = UserIcon;
 
   const fetchfotosPerfil = async () => {
     if (!user || !user.id) return;
@@ -60,7 +60,8 @@ export function Header() {
               )}
             {user ? (
               <div className="container_perfil">
-                <img className="inconePerfil" src={fotoPerfil ? fotoPerfil.foto : defaultAvatar} alt="Avatar do Perfil" />
+                <img className="inconePerfil"  alt="Avatar do Perfil" />
+                {/* src={fotoPerfil ? fotoPerfil.foto : defaultAvatar}    src da img acima */}
                 <Link to="/Perfil">Perfil</Link>
               </div>
             ) : (
@@ -68,10 +69,6 @@ export function Header() {
             )}
           </div>
         </header>
-
-        <section>
-          <Outlet />
-        </section>
       </main>
 
 

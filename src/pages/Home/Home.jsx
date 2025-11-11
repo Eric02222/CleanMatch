@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { formatPhoneNumber, formatCepNumber, formatTime } from '../../Components/Formarte/Formarte.js';
 import { useAuth } from "../../contexts/AuthContext.jsx"
@@ -6,7 +6,7 @@ import Aviso from '../../components/Aviso/Aviso.jsx';
 // import UserIcon from '../assets/icons/user-icon.svg';
 
 
-function Home() {
+export function Home() {
 
     const [usuarios, setUsuarios] = useState([]);
     const [selectedCard, setSelectedCard] = useState(null);
@@ -16,7 +16,7 @@ function Home() {
     const [fotoPerfil, setfotoPerfil] = useState({});
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [itensPorPagina, setItensPorPagina] = useState(10);
-    const defaultAvatar = UserIcon;
+    // const defaultAvatar = UserIcon;
 
 
     const fetchUsuarios = async () => {
@@ -30,6 +30,8 @@ function Home() {
 
     useEffect(() => {
         fetchUsuarios();
+
+    
     }, []);
 
 
@@ -259,11 +261,10 @@ function Home() {
 
             </div>
 
-    
+
 
         </div>
     );
 
 }
 
-export default Home

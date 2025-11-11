@@ -9,7 +9,7 @@ function Botao_cadastro() {
       };
   
       return (
-          <div onClick={irPgCadastro} className='bnt_cadastro'>Cadastro</div>
+          <button onClick={irPgCadastro} className='bnt_cadastro'>Cadastro</button>
       )
 }
 

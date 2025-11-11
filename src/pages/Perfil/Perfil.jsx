@@ -31,15 +31,6 @@ function Perfil() {
     }
   }, [user]);
 
-
-  // ativar caso houver mudança de desing para acesso ao perfil
-  // useEffect(() => {
-  //   if (!user) {
-  //     toast.warning('Você precisa estar logado para acessar esta página.');
-  //     navigate('/');
-  //   }
-  // }, [navigate]);
-
   const fetchAddressByCep = useCallback(async (cep) => {
 
     const cleanedCep = cep.replace(/\D/g, '');
@@ -58,7 +49,11 @@ function Perfil() {
 
           }));
         } else {
-          toast.error('CEP não encontrado. Verifique o CEP digitado.');
+          toast.error('CEP não encontrado. Verifique o CEP digitado.', {
+            autoClose: 3000,
+            hideProgressBar: true,
+            pauseOnHover: false
+          });
 
           setAccountData((prevData) => ({
             ...prevData,
@@ -148,14 +143,26 @@ function Perfil() {
         setIsEditing(false);
         setShowSaveModal(false);
 
-        toast.success('Dados salvos com sucesso!');
+        toast.success('Dados salvos com sucesso!', {
+          autoClose: 3000,
+          hideProgressBar: true,
+          pauseOnHover: false
+        });
         setOriginalAccountData(accountData);
       } else {
-        toast.error('Preencha todos os campos corretamente')
+        toast.error('Preencha todos os campos corretamente', {
+          autoClose: 3000,
+          hideProgressBar: true,
+          pauseOnHover: false
+        })
         setShowSaveModal(false);
       }
     } catch (error) {
-      toast.error('Erro ao salvar dados. Tente novamente.');
+      toast.error('Erro ao salvar dados. Tente novamente.', {
+        autoClose: 3000,
+        hideProgressBar: true,
+        pauseOnHover: false
+      });
       console.error('Erro ao salvar dados:', error);
     }
   };
@@ -175,9 +182,17 @@ function Perfil() {
       setuser(null);
       setShowDeleteModal(false);
       navigate('/');
-      return toast.success('Conta excluída com sucesso!');
+      return toast.success('Conta excluída com sucesso!', {
+        autoClose: 3000,
+        hideProgressBar: true,
+        pauseOnHover: false
+      });
     } catch (error) {
-      toast.error('Erro ao excluir conta. Tente novamente.');
+      toast.error('Erro ao excluir conta. Tente novamente.', {
+        autoClose: 3000,
+        hideProgressBar: true,
+        pauseOnHover: false
+      });
       console.error('Erro ao excluir conta:', error);
     }
   };

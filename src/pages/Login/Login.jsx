@@ -3,9 +3,9 @@ import { toast } from 'react-toastify';
 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'
+import { useAuth } from '../../contexts/AuthContext';
 
-function Login() {
+export function Login() {
     const { login, user } = useAuth()
     const [emailLogin, setEmailLogin] = useState('')
     const [senhaLogin, setSenhaLogin] = useState('')
@@ -14,7 +14,7 @@ function Login() {
 
     useEffect(() => {
         if (user) {
-            navigate('/DashBoard')
+            navigate('/')
         }
     }, [user, navigate]);
 
@@ -61,42 +61,45 @@ function Login() {
 
     }
 
+
+
+    return (
+        <div>
+            <form onSubmit={handleLogin} >
+
+                <div>
+                    <h1 className='titulo_login'>Login</h1>
+                </div>
+
+                <div className='container_conteudos_login'>
+
+                    <div className='inputs-login'>
+                        <label htmlFor="input-emailLo" className='label-emailLo'>Email</label>
+                        <input type="text" className='input-emailLo' value={emailLogin} required onChange={(event) => setEmailLogin(event.target.value)} />
+
+                        <label htmlFor="input-senhaLo" className='label-senhaLo'>Senha</label>
+                        <input type="password" className='input-senhaLo' value={senhaLogin} required onChange={(event) => setSenhaLogin(event.target.value)} />
+                    </div>
+
+                    <div className='irPg_cadastro'>
+                        <label onClick={() => navigate('/Cadastro')}>Não tem uma conta?</label>
+                    </div>
+
+                    <div className='container_bnt_login'>
+
+                        <button type="submit" className='botao-login' >Logar</button>
+                    </div>
+
+
+                </div>
+
+
+            </form>
+        </div>
+
+    )
+
+
+
 }
 
-return (
-    <div>
-        <form onSubmit={handleLogin} >
-
-            <div>
-                <h1 className='titulo_login'>Login</h1>
-            </div>
-
-            <div className='container_conteudos_login'>
-
-                <div className='inputs-login'>
-                    <label htmlFor="input-emailLo" className='label-emailLo'>Email</label>
-                    <input type="text" className='input-emailLo' value={emailLogin} required onChange={(event) => setEmailLogin(event.target.value)} />
-
-                    <label htmlFor="input-senhaLo" className='label-senhaLo'>Senha</label>
-                    <input type="password" className='input-senhaLo' value={senhaLogin} required onChange={(event) => setSenhaLogin(event.target.value)} />
-                </div>
-
-                <div className='irPg_cadastro'>
-                    <label onClick={() => navigate('/Cadastro')}>Não tem uma conta?</label>
-                </div>
-
-                <div className='container_bnt_login'>
-
-                    <button className='botao-login' type="submit" >Logar</button>
-                </div>
-
-
-            </div>
-
-
-        </form>
-    </div>
-
-)
-
-export default Login

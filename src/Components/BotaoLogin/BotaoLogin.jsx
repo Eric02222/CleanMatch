@@ -9,7 +9,7 @@ function Botao_login() {
     };
 
     return (
-        <div onClick={irPgLogin} className='bnt_login'>Login</div>
+        <button onClick={irPgLogin} className='bnt_login'>Login</button>
     )
 }
 
