@@ -9,6 +9,7 @@ export function Login() {
     const { login, user } = useAuth()
     const [emailLogin, setEmailLogin] = useState('')
     const [senhaLogin, setSenhaLogin] = useState('')
+    const [isSaving, SetIsSaving] = useState(false)
     const navigate = useNavigate()
 
 
@@ -20,6 +21,7 @@ export function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault()
+        SetIsSaving(true)
 
         try {
             const data = {
@@ -27,11 +29,12 @@ export function Login() {
                 senha: senhaLogin
             }
 
-            const res = await axios.post(' http://localhost:3000/auth/login', data)
+            const res = await axios.post(' http://localhost:4000/auth/login', data)
             const token = res.data.accessToken
             console.log(res)
 
             if (res.data.length === 0) {
+                SetIsSaving(false)
                 return toast.error('Usuario não encontrado', {
                     autoClose: 3000,
                     hideProgressBar: true,
@@ -39,6 +42,8 @@ export function Login() {
                 })
             }
 
+
+            SetIsSaving(false)
             login(emailLogin, token)
             toast.success('Login realizado com sucesso!', {
                 autoClose: 3000,
@@ -50,6 +55,7 @@ export function Login() {
 
         }
         catch (error) {
+            SetIsSaving(false)
             console.log('Erro ao de conexão:', error);
             toast.error('Erro ao conectar ao servidor', {
                 autoClose: 3000,
@@ -87,7 +93,7 @@ export function Login() {
 
                     <div className='container_bnt_login'>
 
-                        <button type="submit" className='botao-login' >Logar</button>
+                        <button type="submit" className='botao-login' >{isSaving ? 'Logando' : 'Logar'}</button>
                     </div>
 
 

@@ -14,7 +14,7 @@ model Usuario {
   email               String    @unique @db.VarChar(100)
   senha               String
   contato             Int
-  tipo_conta          UserRole  @default(CLIENTE)
+  tipo_conta          String
   cep                 Int
   estado              String
   cidade              String
@@ -31,15 +31,10 @@ model Usuario {
 
 model token {
   id        Int      @id @default(autoincrement())
-  token     String
+  token     String   @db.VarChar(255)
   type      String
   expiresAt DateTime
   revoked   Boolean  @default(value: false)
   usuarioId Int
   usuario   Usuario  @relation(fields: [usuarioId], references: [id])
-}
-
-enum UserRole {
-  CLIENTE              @map("Cliente")
-  PRESTADOR_DE_SERVICO @map("Prestador/a de Serviço")
 }

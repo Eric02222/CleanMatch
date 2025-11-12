@@ -19,7 +19,14 @@ export function Cadastro() {
 
     const ispassordValid = () => senha.length >= 8 && senha === vaSenha
 
-
+    const resetForm = () => {
+        setNome('')
+        setEmail('')
+        setSenha('')
+        setVaSenha('')
+        setTipoConta('Cliente')
+        SetIsPasswordMatch(true)
+    }
 
     const cadastro = async (e) => {
         e.preventDefault()
@@ -48,11 +55,9 @@ export function Cadastro() {
                 pauseOnHover: false
             })
 
-            fetchUsuarios();
-            limparForm();
-            setTimeout(() => {
-                navigate('/Login');
-            }, 800);
+
+            navigate('/login');
+
 
         } catch (error) {
             console.error("Erro ao criar usuario", error)
@@ -65,12 +70,6 @@ export function Cadastro() {
         }
     }
 
-    function limparForm() {
-        setEmail('')
-        setSenha('')
-        setVaSenha('')
-        setNome('')
-    }
 
     return (
         <div className='container-cadastro'>
@@ -88,10 +87,10 @@ export function Cadastro() {
                     <input type="text" className='input-email' value={email} onChange={(event) => setEmail(event.target.value)} required />
 
                     <label htmlFor="input-senha" className='label-senhaCad'>Senha</label>
-                    <input type="password" className='input-senha' value={senha} onChange={(event) => setSenha(event.target.value)} required minLength={8}/>
+                    <input type="password" className='input-senha' value={senha} onChange={(event) => setSenha(event.target.value)} required minLength={8} />
 
                     <label htmlFor="input-coSenha" className='label-coSenhaCad'>Confirmar Senha</label>
-                    <input type="password" className='input-coSenha' value={vaSenha} onChange={(event) => setVaSenha(event.target.value)} required minLength={8}/>
+                    <input type="password" className='input-coSenha' value={vaSenha} onChange={(event) => setVaSenha(event.target.value)} required minLength={8} />
 
                     {!isPasswordMatch && (
                         <p className='text-red-500 text-sm mt-1 text-center'>Senhas não correspodem</p>

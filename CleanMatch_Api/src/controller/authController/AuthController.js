@@ -15,7 +15,7 @@ class AuthController {
         res
     ) {
         try {
-            const { nome, email, senha, tipo_conta } = req.body;
+            const { nome, email, senha, tipo_conta, contato = 0, cep = 0, estado = "", cidade = "", valor_min = 0, valor_max = 0, cargaHoraria_inicio = null, cargaHoraria_fim = null, descricao = "", foto_perfil = 'teste' } = req.body;
             // Validação básica
             if (!email || !senha) {
                 return res.status(400).json({ error: "Email e senha são obrigatórios" });
@@ -32,13 +32,22 @@ class AuthController {
             const hashedsenha = await bcrypt.hash(senha, saltRounds);
             // Criar usuário no banco de dados
             const usuario = await prismaClient.usuario.create({
-                data: { nome: nome, email: email, senha: hashedsenha, tipo_conta: tipo_conta || null },
+                data: { nome: nome, email: email, senha: hashedsenha, tipo_conta: tipo_conta, contato: contato, cep: cep, estado: estado, cidade: cidade, valor_min:valor_min, valor_max: valor_max, cargaHoraria_inicio: cargaHoraria_inicio, cargaHoraria_fim: cargaHoraria_fim, descricao: descricao, foto_perfil: foto_perfil || null },
                 select: {
                     id: true,
                     email: true,
                     nome: true,
                     tipo_conta: true,
-
+                    contato: true,
+                    cep: true,
+                    estado: true,
+                    cidade: true,
+                    valor_min: true,
+                    valor_max: true,
+                    cargaHoraria_inicio: true,
+                    cargaHoraria_fim: true,
+                    descricao: true,
+                    foto_perfil: true,
                 },
             });
             return res.status(201).json(usuario);

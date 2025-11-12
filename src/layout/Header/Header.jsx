@@ -18,9 +18,9 @@ export function Header() {
     if (!user || !user.id) return;
 
     try {
-      const response = await axios.get('http://localhost:3000/foto_perfil');
-      const todasAsFotos = response.data;
-      const fotoDoUsuario = todasAsFotos.find(foto => foto.usuarios_id === user.id);
+      const response = await axios.get('http://localhost:4000/usuario');
+      const todasAsFotos = response.data.foto_perfil;
+      const fotoDoUsuario = todasAsFotos.find(foto => foto.id === user.id);
 
       if (fotoDoUsuario) {
         setfotoPerfil(fotoDoUsuario);
