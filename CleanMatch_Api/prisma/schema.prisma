@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:861391@localhost:3306/cleanMatch"
+  url      = "mysql://root:senai@localhost:3306/cleanMatch"
 }
 
 //referencia

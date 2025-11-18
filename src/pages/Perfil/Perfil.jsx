@@ -11,7 +11,7 @@ function Perfil() {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
   const navigate = useNavigate();
   const [accountData, setAccountData] = useState({});
   const [originalAccountData, setOriginalAccountData] = useState({});
@@ -137,9 +137,11 @@ function Perfil() {
     try {
 
       if (validarEmail(accountData.email)) {
-        await axios.put(`http://localhost:3000/usuarios/${user.id}`, accountData);
+        await axios.put(`http://localhost:3000/usuarios/${user.id}`, accountData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        setuser(accountData);
+        setUser(accountData);
         setIsEditing(false);
         setShowSaveModal(false);
 
@@ -177,9 +179,11 @@ function Perfil() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:3000/usuarios/${user.id}`);
+      await axios.delete(`http://localhost:3000/usuarios/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      setuser(null);
+      setUser(null);
       setShowDeleteModal(false);
       navigate('/');
       return toast.success('Conta excluída com sucesso!', {

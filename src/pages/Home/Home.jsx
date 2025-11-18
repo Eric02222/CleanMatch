@@ -21,7 +21,9 @@ export function Home() {
 
     const fetchUsuarios = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/usuarios');
+            const response = await axios.get('http://localhost:3000/usuarios', {
+                headers: { Authorization: `Bearer ${token}` },
+              });
             setUsuarios(response.data);
         } catch (error) {
             console.error('Erro ao buscar usuários:', error);
@@ -37,7 +39,9 @@ export function Home() {
 
     const fetchfotosPerfil = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/foto_perfil');
+            const response = await axios.get('http://localhost:3000/usuarios', {
+                headers: { Authorization: `Bearer ${token}` },
+              });
             const todasAsFotos = response.data;
 
 

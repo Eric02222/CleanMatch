@@ -14,7 +14,9 @@ function Foto_de_perfil() {
         if (!user || !user.id) return;
 
         try {
-            const response = await axios.get('http://localhost:3000/foto_perfil');
+            const response = await axios.get('http://localhost:3000/foto_perfil', {
+                headers: { Authorization: `Bearer ${token}` },
+              });
             const todasAsFotos = response.data;
             const fotoDoUsuario = todasAsFotos.find(foto => foto.usuarios_id === user.id);
 

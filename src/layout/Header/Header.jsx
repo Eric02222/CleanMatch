@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from "../../contexts/AuthContext.jsx"
 import axios from 'axios';
 // import UserIcon from '../assets/icons/user-icon.svg';
-import { Outlet } from "react-router"
+
 
 export function Header() {
   const { user } = useAuth()
@@ -18,7 +18,9 @@ export function Header() {
     if (!user || !user.email) return;
 
     try {
-      const response = await axios.get('http://localhost:4000/usuario');
+      const response = await axios.get('http://localhost:4000/usuario', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const todasAsFotos = response.data.foto_perfil;
       const fotoDoUsuario = todasAsFotos.find(foto => foto.id === user.id);
 
