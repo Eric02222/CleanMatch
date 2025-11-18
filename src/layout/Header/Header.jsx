@@ -15,7 +15,7 @@ export function Header() {
   // const defaultAvatar = UserIcon;
 
   const fetchfotosPerfil = async () => {
-    if (!user || !user.id) return;
+    if (!user || !user.email) return;
 
     try {
       const response = await axios.get('http://localhost:4000/usuario');

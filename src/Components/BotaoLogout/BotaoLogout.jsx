@@ -17,7 +17,7 @@ function bnt_Logout() {
     };
 
     return (
-        <button onClick={deslogar()} className='bnt_logout'>Logout</button>
+        <button onClick={deslogar} className='bnt_logout'>Logout</button>
     )
 }
 
