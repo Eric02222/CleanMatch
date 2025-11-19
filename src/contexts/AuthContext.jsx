@@ -5,26 +5,26 @@ const AuthContext = createContext()
 
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState("");
-
-    const [usuarioLogado, setUsuarioLogado] = useState(() => {
-        const usuarioSalvo = localStorage.getItem('usuarioLogado')
-        return usuarioSalvo ? JSON.parse(usuarioSalvo) : null
-    })
-
-    // se ja tiver no localstorage, mantem login
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const savedEmail = localStorage.getItem("email")
-        if (savedEmail) {
-            setUser({ email: savedEmail })
+        const savedUserJson = localStorage.getItem("user");
+        if (savedUserJson) {
+            try {
+                const savedUser = JSON.parse(savedUserJson);
+                setUser(savedUser);
+            } catch (e) {
+                console.error("Erro ao analisar JSON do usuário:", e);
+                localStorage.removeItem("user");
+                setUser(null);
+            }
         }
     }, [])
 
-    const login = (email, token) => {
-        localStorage.setItem("email", email)
+    const login = (userData, token) => {
+        localStorage.setItem("user", JSON.stringify(userData));
         localStorage.setItem("token", token)
-        setUser({ email, token })
+        setUser({ userData, token })
     }
 
     const logout = () => {
@@ -33,13 +33,13 @@ export const AuthProvider = ({ children }) => {
             hideProgressBar: true,
             pauseOnHover: false
         })
-        localStorage.removeItem("email")
+        localStorage.removeItem("user")
         localStorage.removeItem("token")
-        setUser("")
+        setUser(null)
     }
 
     return (
-        <AuthContext.Provider value={{usuarioLogado, setUsuarioLogado, user, setUser, login, logout }}>
+        <AuthContext.Provider value={{ user, setUser, login, logout }}>
             {children}
         </AuthContext.Provider>
     )

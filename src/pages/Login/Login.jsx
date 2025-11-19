@@ -42,9 +42,13 @@ export function Login() {
                 })
             }
 
+            const usuario = await axios.post(' http://localhost:4000"/usuarios/byemail"', data.email, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+
 
             SetIsSaving(false)
-            login(emailLogin, token)
+            login(usuario, token)
             toast.success('Login realizado com sucesso!', {
                 autoClose: 3000,
                 hideProgressBar: true,
