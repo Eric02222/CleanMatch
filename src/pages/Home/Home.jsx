@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { formatPhoneNumber, formatCepNumber, formatTime } from '../../Components/Formarte/Formarte.js';
-import { useAuth } from "../../contexts/AuthContext.jsx"
-import Aviso from '../../components/Aviso/Aviso.jsx';
+import { useAuth } from "../../contexts/AuthContext.jsx";
+import Aviso from '../../Components/Aviso/Aviso.jsx';
 // import UserIcon from '../assets/icons/user-icon.svg';
 
 
@@ -16,6 +16,7 @@ export function Home() {
     const [fotoPerfil, setfotoPerfil] = useState({});
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [itensPorPagina, setItensPorPagina] = useState(10);
+    const token = user?.token;
     // const defaultAvatar = UserIcon;
 
 
@@ -23,7 +24,7 @@ export function Home() {
         try {
             const response = await axios.get('http://localhost:3000/usuarios', {
                 headers: { Authorization: `Bearer ${token}` },
-              });
+            });
             setUsuarios(response.data);
         } catch (error) {
             console.error('Erro ao buscar usuários:', error);
@@ -33,7 +34,7 @@ export function Home() {
     useEffect(() => {
         fetchUsuarios();
 
-    
+
     }, []);
 
 
@@ -41,7 +42,7 @@ export function Home() {
         try {
             const response = await axios.get('http://localhost:3000/usuarios', {
                 headers: { Authorization: `Bearer ${token}` },
-              });
+            });
             const todasAsFotos = response.data;
 
 

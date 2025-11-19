@@ -42,13 +42,30 @@ export function Login() {
                 })
             }
 
-            const usuario = await axios.post(' http://localhost:4000"/usuarios/byemail"', data.email, {
-                headers: { Authorization: `Bearer ${token}` },
-              })
+            const userRes = await axios.get('http://localhost:4000/usuarios/byemail', {
+                params: {
+                    email: data.email
+                },
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+            })
 
+            const userDataArray = userRes.data;
+            const userData = Array.isArray(userDataArray) ? userDataArray[0] : userDataArray;
+
+            if (!userData) {
+                SetIsSaving(false)
+                return toast.error('Dados do usuário não encontrados após login', { /* ... */ })
+            }
+
+            const fullUserData = {
+                ...userData, // Espalha todos os dados do usuário (id, nome, email, etc.)
+                token,       // Adiciona o token no objeto
+            };
 
             SetIsSaving(false)
-            login(usuario, token)
+            login(fullUserData)
             toast.success('Login realizado com sucesso!', {
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -88,7 +105,7 @@ export function Login() {
                         <input type="text" className='input-emailLo' value={emailLogin} required onChange={(event) => setEmailLogin(event.target.value)} />
 
                         <label htmlFor="input-senhaLo" className='label-senhaLo'>Senha</label>
-                        <input type="password" className='input-senhaLo' value={senhaLogin} required onChange={(event) => setSenhaLogin(event.target.value)} minLength={8}/>
+                        <input type="password" className='input-senhaLo' value={senhaLogin} required onChange={(event) => setSenhaLogin(event.target.value)} minLength={8} />
                     </div>
 
                     <div className='irPg_cadastro'>

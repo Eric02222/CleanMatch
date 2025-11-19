@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:senai@localhost:3306/cleanMatch"
+  url      = "mysql://root:861391@localhost:3306/cleanMatch"
 }
 
 //referencia
@@ -23,7 +23,7 @@ model Usuario {
   cargaHoraria_inicio DateTime?
   cargaHoraria_fim    DateTime?
   descricao           String    @db.VarChar(500)
-  foto_perfil         String    @db.VarChar(150)
+  foto_perfil         String?   @db.LongText
   tokens              token[]
 
   @@map("usuario")

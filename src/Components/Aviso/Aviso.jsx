@@ -3,7 +3,7 @@
 function Aviso() {
   return (
     <div className='cointainer_aviso'>
-        <img id="img-aviso" src={AvisoIcon} alt="icone-aviso" />
+        {/* <img id="img-aviso" src={AvisoIcon} alt="icone-aviso" /> */}
         <p className='msg_aviso'>Por favor, preencha todas as suas informações de perfil</p>
     </div>
   )

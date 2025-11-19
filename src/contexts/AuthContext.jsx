@@ -6,25 +6,31 @@ const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    
 
     useEffect(() => {
-        const savedUserJson = localStorage.getItem("user");
-        if (savedUserJson) {
-            try {
-                const savedUser = JSON.parse(savedUserJson);
-                setUser(savedUser);
-            } catch (e) {
-                console.error("Erro ao analisar JSON do usuário:", e);
-                localStorage.removeItem("user");
-                setUser(null);
+        const carregarUsuarioArmazenado = () => {
+            const storedUser = localStorage.getItem("user");
+            
+            if (storedUser) {
+                try {
+                    const parsedUser = JSON.parse(storedUser);
+                    setUser(parsedUser);
+                } catch (error) {
+                    console.error("Erro ao ler dados do usuário:", error);
+                    localStorage.removeItem("user"); 
+                }
             }
-        }
-    }, [])
+            setLoading(false); // Terminou de carregar
+        };
 
-    const login = (userData, token) => {
+        carregarUsuarioArmazenado();
+    }, []);
+
+    const login = (userData) => {
         localStorage.setItem("user", JSON.stringify(userData));
-        localStorage.setItem("token", token)
-        setUser({ userData, token })
+        setUser( userData )
     }
 
     const logout = () => {
@@ -34,12 +40,11 @@ export const AuthProvider = ({ children }) => {
             pauseOnHover: false
         })
         localStorage.removeItem("user")
-        localStorage.removeItem("token")
         setUser(null)
     }
 
     return (
-        <AuthContext.Provider value={{ user, setUser, login, logout }}>
+        <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
             {children}
         </AuthContext.Provider>
     )

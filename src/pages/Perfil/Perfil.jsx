@@ -8,31 +8,43 @@ import 'react-toastify/dist/ReactToastify.css';
 import Foto_de_perfil from '../../Components/FotoPerfil/FotoPerfil.jsx';
 
 function Perfil() {
+  const { user, setUser } = useAuth()
+  const navigate = useNavigate();
+  
+  // Extrai o token com segurança
+  const token = user?.token;
+
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const { user, setUser } = useAuth()
-  const navigate = useNavigate();
+  
   const [accountData, setAccountData] = useState({});
   const [originalAccountData, setOriginalAccountData] = useState({});
 
   const [displayContato, setDisplayContato] = useState('');
   const [displayCep, setDisplayCep] = useState('');
 
-
+  // Carrega os dados do usuário nos estados locais
   useEffect(() => {
-    if (user) {
+    if (user && Object.keys(user).length > 0) {
       setAccountData(user);
       setOriginalAccountData(user);
-      console.log(accountData)
-
       setDisplayContato(formatPhoneNumber(user.contato || ''));
       setDisplayCep(formatCepNumber(user.cep || ''));
     }
   }, [user]);
 
-  const fetchAddressByCep = useCallback(async (cep) => {
+  // Proteção: Se user for null (ainda carregando ou não logado)
+  if (!user) {
+      return (
+        <div className="container-perfil" style={{ padding: '20px', textAlign: 'center' }}>
+            <h2>Carregando perfil...</h2>
+            <p>Se demorar muito, por favor faça login novamente.</p>
+        </div>
+      );
+  }
 
+  const fetchAddressByCep = useCallback(async (cep) => {
     const cleanedCep = cep.replace(/\D/g, '');
 
     if (cleanedCep.length === 8) {
@@ -45,16 +57,11 @@ function Perfil() {
             ...prevData,
             estado: data.uf,
             cidade: data.localidade,
-            rua: data.logradouro,
+            rua: data.logradouro
 
           }));
         } else {
-          toast.error('CEP não encontrado. Verifique o CEP digitado.', {
-            autoClose: 3000,
-            hideProgressBar: true,
-            pauseOnHover: false
-          });
-
+          toast.error('CEP não encontrado.', { autoClose: 3000 });
           setAccountData((prevData) => ({
             ...prevData,
             estado: '',
@@ -63,14 +70,8 @@ function Perfil() {
           }));
         }
       } catch (error) {
-        toast.error('Erro ao buscar CEP. Tente novamente.');
-        console.error('Erro ao buscar CEP:', error);
-        setAccountData((prevData) => ({
-          ...prevData,
-          estado: '',
-          cidade: '',
-          rua: '',
-        }));
+        toast.error('Erro ao buscar CEP.');
+        console.error(error);
       }
     }
   }, []);
@@ -109,13 +110,6 @@ function Perfil() {
 
     if (cleanedValue.length === 8) {
       fetchAddressByCep(cleanedValue);
-    } else {
-      setAccountData((prevData) => ({
-        ...prevData,
-        estado: '',
-        cidade: '',
-        rua: '',
-      }));
     }
   };
 
@@ -127,45 +121,40 @@ function Perfil() {
   const handleCancelEdit = () => {
     setIsEditing(false);
     setAccountData(originalAccountData);
+    setDisplayContato(formatPhoneNumber(originalAccountData.contato || ''));
+    setDisplayCep(formatCepNumber(originalAccountData.cep || ''));
   };
 
   const handleSaveClick = () => {
     setShowSaveModal(true);
   };
 
-  const confirmSave = async () => {
+  const confirmSave = async (e) => {
+    if (e) e.preventDefault();
     try {
-
-      if (validarEmail(accountData.email)) {
-        await axios.put(`http://localhost:3000/usuarios/${user.id}`, accountData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setUser(accountData);
-        setIsEditing(false);
-        setShowSaveModal(false);
-
-        toast.success('Dados salvos com sucesso!', {
-          autoClose: 3000,
-          hideProgressBar: true,
-          pauseOnHover: false
-        });
-        setOriginalAccountData(accountData);
-      } else {
-        toast.error('Preencha todos os campos corretamente', {
-          autoClose: 3000,
-          hideProgressBar: true,
-          pauseOnHover: false
-        })
-        setShowSaveModal(false);
+      if (!validarEmail(accountData.email)) {
+         toast.error('Email inválido');
+         setShowSaveModal(false);
+         return;
       }
-    } catch (error) {
-      toast.error('Erro ao salvar dados. Tente novamente.', {
-        autoClose: 3000,
-        hideProgressBar: true,
-        pauseOnHover: false
+
+      await axios.put(`http://localhost:4000/usuarios/${user.id}`, accountData, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      console.error('Erro ao salvar dados:', error);
+
+      setUser({ ...accountData, token: token });
+
+      localStorage.setItem("user", JSON.stringify({ ...accountData, token: token }));
+
+      setIsEditing(false);
+      setShowSaveModal(false);
+
+      toast.success('Dados salvos com sucesso!');
+      setOriginalAccountData(accountData);
+      
+    } catch (error) {
+      toast.error('Erro ao salvar dados.');
+      console.error('Erro ao salvar:', error);
     }
   };
 
@@ -177,27 +166,22 @@ function Perfil() {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = async () => {
+  const confirmDelete = async (e) => {
+    if (e) e.preventDefault();
     try {
-      await axios.delete(`http://localhost:3000/usuarios/${user.id}`, {
+
+      await axios.delete(`http://localhost:4000/usuarios/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       setUser(null);
       setShowDeleteModal(false);
+      localStorage.removeItem("user"); 
       navigate('/');
-      return toast.success('Conta excluída com sucesso!', {
-        autoClose: 3000,
-        hideProgressBar: true,
-        pauseOnHover: false
-      });
+      toast.success('Conta excluída com sucesso!');
     } catch (error) {
-      toast.error('Erro ao excluir conta. Tente novamente.', {
-        autoClose: 3000,
-        hideProgressBar: true,
-        pauseOnHover: false
-      });
-      console.error('Erro ao excluir conta:', error);
+      toast.error('Erro ao excluir conta.');
+      console.error(error);
     }
   };
 
@@ -210,15 +194,15 @@ function Perfil() {
     setAccountData((prevData) => ({
       ...prevData,
       tipo_conta: newType,
-      cargaHoraria_inicio: newType === 'Cliente' ? null : prevData.cargaHoraria_inicio,
-      cargaHoraria_fim: newType === 'Cliente' ? null : prevData.cargaHoraria_fim,
-      valor_max: newType === 'Cliente' ? null : prevData.valor_max,
-      valor_min: newType === 'Cliente' ? null : prevData.valor_min,
-      descricao: newType === 'Cliente' ? null : prevData.descricao,
+      ...(newType === 'Cliente' && {
+        cargaHoraria_inicio: null,
+        cargaHoraria_fim: null,
+        valor_max: null,
+        valor_min: null,
+        descricao: null,
+      })
     }));
   };
-
-
 
   return (
     <div className="container-perfil">
@@ -230,18 +214,19 @@ function Perfil() {
         <div className='dados_usuario'>
           <h2 className="nome">{accountData?.nome}</h2>
           <p>Email: {accountData?.email}</p>
-          <p>Contato: {accountData?.contato}</p>
+          <p>Contato: {displayContato}</p>
           <p>Estado: {accountData?.estado}</p>
           <p>Cidade: {accountData?.cidade}</p>
-          <p>Horario: {accountData?.cargaHoraria_inicio} - {accountData?.cargaHoraria_fim}</p>
-          <p>Faixa de Preço: {accountData?.valor_min} - {accountData?.valor_max}</p>
+          {accountData?.tipo_conta === 'Prestador/a de Serviço' && (
+             <>
+                <p>Horario: {accountData?.cargaHoraria_inicio} - {accountData?.cargaHoraria_fim}</p>
+                <p>Faixa de Preço: {accountData?.valor_min} - {accountData?.valor_max}</p>
+             </>
+          )}
         </div>
       </div>
 
-
-
       <div className="detalhes_conta">
-
         <div className='titulo'>
           <h1>Detalhes da Conta</h1>
         </div>
@@ -251,7 +236,7 @@ function Perfil() {
           <select
             id="tipo_conta"
             name="tipo_conta"
-            value={accountData.tipo_conta || ''}
+            value={accountData?.tipo_conta || ''}
             onChange={handleTypeChange}
             disabled={!isEditing}
           >
@@ -266,19 +251,21 @@ function Perfil() {
             type="text"
             id="nome_detalhes"
             name="nome"
-            value={accountData.nome || ''}
+            value={accountData?.nome || ''}
             onChange={handleInputChange}
             readOnly={!isEditing}
           />
         </div>
 
+        {/* ... Restante dos inputs ... */}
+        
         <div className="input-group">
           <label htmlFor="email">E-mail:</label>
           <input
             type="email"
             id="email"
             name="email"
-            value={accountData.email || ''}
+            value={accountData?.email || ''}
             onChange={handleInputChange}
             readOnly={!isEditing}
           />
@@ -316,7 +303,7 @@ function Perfil() {
             type="text"
             id="estado"
             name="estado"
-            value={accountData.estado || ''}
+            value={accountData?.estado || ''}
             onChange={handleInputChange}
             readOnly={!isEditing}
           />
@@ -328,7 +315,7 @@ function Perfil() {
             type="text"
             id="cidade"
             name="cidade"
-            value={accountData.cidade || ''}
+            value={accountData?.cidade || ''}
             onChange={handleInputChange}
             readOnly={!isEditing}
           />
@@ -340,14 +327,13 @@ function Perfil() {
             type="text"
             id="rua"
             name="rua"
-            value={accountData.rua || ''}
+            value={accountData?.rua || ''}
             onChange={handleInputChange}
             readOnly={!isEditing}
           />
         </div>
 
-
-        {accountData.tipo_conta === 'Prestador/a de Serviço' && (
+        {accountData?.tipo_conta === 'Prestador/a de Serviço' && (
           <>
             <div className="input-group">
               <label htmlFor="cargaHoraria_inicio">Carga Horária Início:</label>
@@ -355,7 +341,7 @@ function Perfil() {
                 type="time"
                 id="cargaHoraria_inicio"
                 name="cargaHoraria_inicio"
-                value={accountData.cargaHoraria_inicio || ''}
+                value={accountData?.cargaHoraria_inicio || ''}
                 onChange={handleInputChange}
                 readOnly={!isEditing}
               />
@@ -366,7 +352,7 @@ function Perfil() {
                 type="time"
                 id="cargaHoraria_fim"
                 name="cargaHoraria_fim"
-                value={accountData.cargaHoraria_fim || ''}
+                value={accountData?.cargaHoraria_fim || ''}
                 onChange={handleInputChange}
                 readOnly={!isEditing}
               />
@@ -377,7 +363,7 @@ function Perfil() {
                 type="number"
                 id="valor_min"
                 name="valor_min"
-                value={accountData.valor_min || ''}
+                value={accountData?.valor_min || ''}
                 onChange={handleInputChange}
                 readOnly={!isEditing}
               />
@@ -388,7 +374,7 @@ function Perfil() {
                 type="number"
                 id="valor_max"
                 name="valor_max"
-                value={accountData.valor_max || ''}
+                value={accountData?.valor_max || ''}
                 onChange={handleInputChange}
                 readOnly={!isEditing}
               />
@@ -398,7 +384,7 @@ function Perfil() {
               <textarea
                 id="descricao"
                 name="descricao"
-                value={accountData.descricao || ''}
+                value={accountData?.descricao || ''}
                 onChange={handleInputChange}
                 readOnly={!isEditing}
                 rows="4"
@@ -406,7 +392,6 @@ function Perfil() {
             </div>
           </>
         )}
-
 
         <div className="button-group">
           {!isEditing ? (
@@ -430,7 +415,6 @@ function Perfil() {
           )}
         </div>
 
-
         {showDeleteModal && (
           <div className="modal-overlay">
             <div className="modal">
@@ -447,7 +431,6 @@ function Perfil() {
             </div>
           </div>
         )}
-
 
         {showSaveModal && (
           <div className="modal-overlay">
@@ -467,10 +450,8 @@ function Perfil() {
         )}
 
       </div>
-
-
     </div>
   );
 }
 
-export default Perfil;  
+export default Perfil;
