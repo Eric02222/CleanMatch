@@ -10,14 +10,14 @@ import Foto_de_perfil from '../../Components/FotoPerfil/FotoPerfil.jsx';
 function Perfil() {
   const { user, setUser } = useAuth()
   const navigate = useNavigate();
-  
+
   // Extrai o token com segurança
   const token = user?.token;
 
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  
+
   const [accountData, setAccountData] = useState({});
   const [originalAccountData, setOriginalAccountData] = useState({});
 
@@ -36,12 +36,12 @@ function Perfil() {
 
   // Proteção: Se user for null (ainda carregando ou não logado)
   if (!user) {
-      return (
-        <div className="container-perfil" style={{ padding: '20px', textAlign: 'center' }}>
-            <h2>Carregando perfil...</h2>
-            <p>Se demorar muito, por favor faça login novamente.</p>
-        </div>
-      );
+    return (
+      <div className="container-perfil" style={{ padding: '20px', textAlign: 'center' }}>
+        <h2>Carregando perfil...</h2>
+        <p>Se demorar muito, por favor faça login novamente.</p>
+      </div>
+    );
   }
 
   const fetchAddressByCep = useCallback(async (cep) => {
@@ -130,28 +130,38 @@ function Perfil() {
   };
 
   const confirmSave = async (e) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     try {
-      if (!validarEmail(accountData.email)) {
-         toast.error('Email inválido');
-         setShowSaveModal(false);
-         return;
+      if (!accountData.email || !validarEmail(accountData.email)) {
+        toast.error('Email inválido');
+        setShowSaveModal(false);
+        return;
       }
 
-      await axios.put(`http://localhost:4000/usuarios/${user.id}`, accountData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.put(
+        `http://localhost:4000/usuarios/${user.id}`,
+        accountData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 5000 // Adiciona um timeout de 5 segundos para não travar eternamente
+        }
+      );
 
-      setUser({ ...accountData, token: token });
+      const novoUser = { ...accountData, token: token };
 
-      localStorage.setItem("user", JSON.stringify({ ...accountData, token: token }));
+      setUser(novoUser);
+      localStorage.setItem("user", JSON.stringify(novoUser));
 
+      setOriginalAccountData(accountData);
       setIsEditing(false);
       setShowSaveModal(false);
 
       toast.success('Dados salvos com sucesso!');
-      setOriginalAccountData(accountData);
-      
+
     } catch (error) {
       toast.error('Erro ao salvar dados.');
       console.error('Erro ao salvar:', error);
@@ -176,7 +186,7 @@ function Perfil() {
 
       setUser(null);
       setShowDeleteModal(false);
-      localStorage.removeItem("user"); 
+      localStorage.removeItem("user");
       navigate('/');
       toast.success('Conta excluída com sucesso!');
     } catch (error) {
@@ -218,10 +228,10 @@ function Perfil() {
           <p>Estado: {accountData?.estado}</p>
           <p>Cidade: {accountData?.cidade}</p>
           {accountData?.tipo_conta === 'Prestador/a de Serviço' && (
-             <>
-                <p>Horario: {accountData?.cargaHoraria_inicio} - {accountData?.cargaHoraria_fim}</p>
-                <p>Faixa de Preço: {accountData?.valor_min} - {accountData?.valor_max}</p>
-             </>
+            <>
+              <p>Horario: {accountData?.cargaHoraria_inicio} - {accountData?.cargaHoraria_fim}</p>
+              <p>Faixa de Preço: {accountData?.valor_min} - {accountData?.valor_max}</p>
+            </>
           )}
         </div>
       </div>
@@ -258,7 +268,7 @@ function Perfil() {
         </div>
 
         {/* ... Restante dos inputs ... */}
-        
+
         <div className="input-group">
           <label htmlFor="email">E-mail:</label>
           <input
@@ -421,10 +431,10 @@ function Perfil() {
               <h3>Confirmar Exclusão</h3>
               <p>Tem certeza que deseja excluir sua conta? Esta ação é irreversível.</p>
               <div className="modal-actions">
-                <button onClick={confirmDelete} className="confirm-button">
+                <button type="button" onClick={confirmDelete} className="confirm-button">
                   Sim, Deletar
                 </button>
-                <button onClick={cancelDelete} className="cancel-button">
+                <button type="button" onClick={cancelDelete} className="cancel-button">
                   Cancelar
                 </button>
               </div>
@@ -438,10 +448,10 @@ function Perfil() {
               <h3>Salvar Alterações</h3>
               <p>Deseja salvar as alterações na sua conta?</p>
               <div className="modal-actions">
-                <button onClick={confirmSave} className="confirm-button">
+                <button type="button" onClick={confirmSave} className="confirm-button">
                   Sim, Salvar
                 </button>
-                <button onClick={cancelSave} className="cancel-button">
+                <button type="button" onClick={cancelSave} className="cancel-button">
                   Continuar Editando
                 </button>
               </div>

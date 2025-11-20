@@ -5,8 +5,8 @@ CREATE TABLE `usuario` (
     `email` VARCHAR(100) NOT NULL,
     `senha` VARCHAR(191) NOT NULL,
     `contato` INTEGER NOT NULL,
-    `tipo_conta` ENUM('Cliente', 'Prestador/a de Serviço') NOT NULL DEFAULT 'Cliente',
-    `cep` INTEGER NOT NULL,
+    `tipo_conta` VARCHAR(191) NOT NULL,
+    `cep` VARCHAR(191) NOT NULL,
     `estado` VARCHAR(191) NOT NULL,
     `cidade` VARCHAR(191) NOT NULL,
     `valor_min` INTEGER NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE `usuario` (
     `cargaHoraria_inicio` DATETIME(3) NULL,
     `cargaHoraria_fim` DATETIME(3) NULL,
     `descricao` VARCHAR(500) NOT NULL,
-    `foto_perfil` VARCHAR(150) NOT NULL,
+    `foto_perfil` LONGTEXT NULL,
 
     UNIQUE INDEX `usuario_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -23,7 +23,7 @@ CREATE TABLE `usuario` (
 -- CreateTable
 CREATE TABLE `token` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `token` VARCHAR(191) NOT NULL,
+    `token` VARCHAR(255) NOT NULL,
     `type` VARCHAR(191) NOT NULL,
     `expiresAt` DATETIME(3) NOT NULL,
     `revoked` BOOLEAN NOT NULL DEFAULT false,

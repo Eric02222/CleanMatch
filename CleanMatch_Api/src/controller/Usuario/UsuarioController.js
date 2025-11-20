@@ -9,7 +9,7 @@ class UsuarioController {
         const pageNumber = Number(page);
         const pageLimit = Number(limit);
         try {
-            const usuarios = await prismaClient.usuario.findMany({               
+            const usuarios = await prismaClient.usuario.findMany({
                 skip: (pageNumber - 1) * pageLimit,
                 take: pageLimit,
             });
@@ -38,17 +38,17 @@ class UsuarioController {
 
     async getUsuarioPorEmail(req, res) {
         try {
-          const email = String(req.query.email);
-          const usuario = await prismaClient.usuario.findUnique({
-            where: { email },
-          });
-          if (!usuario) return res.status(404).send("Usuário não existe!");
-          return res.json(usuario);
+            const email = String(req.query.email);
+            const usuario = await prismaClient.usuario.findUnique({
+                where: { email },
+            });
+            if (!usuario) return res.status(404).send("Usuário não existe!");
+            return res.json(usuario);
         } catch (e) {
-          console.error(" Erro em getUsuarioPorEmail:", e);
-          return res.status(500).json({ error: "Erro ao buscar usuário" });
+            console.error(" Erro em getUsuarioPorEmail:", e);
+            return res.status(500).json({ error: "Erro ao buscar usuário" });
         }
-      }
+    }
 
     async criarUsuario(req, res) {
         try {
@@ -73,28 +73,23 @@ class UsuarioController {
     async atualizarUsuario(req, res) {
         try {
             const { body, params } = req
-            if (body.nome || body.email || body.senha || body.contato || body.tipo_conta || body.cep || body.estado || body.cidade || body.valor_min || body.valor_max 
-                || body.cargaHoraria_inicio || body.cargaHoraria_fim || body.descricao || body.foto_perfil) {
-                await prismaClient.usuario.update({
-                    where: { id: Number(params.id) },
-                    data: {
-                        ...body
-                    },
-                })
+            const { token, id, ...dadosParaSalvar } = body;
 
-                const usuarioAtualizado = await prismaClient.usuario.findUnique({
-                    where: {
-                        id: Number(params.id)
-                    }
-                })
-
-                res.status(201).json({
-                    message: "Usuário atualizado!",
-                    data: usuarioAtualizado
-                })
-            } else {
-                res.status(404).send("Atributos enviados não condizem com o schema")
+            if (Object.keys(dadosParaSalvar).length === 0) {
+                return res.status(400).send("Nenhum dado válido para atualizar.");
             }
+
+            const usuarioAtualizado = await prismaClient.usuario.update({
+                where: { id: Number(params.id) },
+                data: dadosParaSalvar
+            });
+
+            delete usuarioAtualizado.senha;
+
+            return res.status(200).json({
+                message: "Usuário atualizado!",
+                data: usuarioAtualizado
+            });
         } catch (error) {
             if (error.code == "P2025") {
                 res.status(404).send("Usuário não existe no banco")

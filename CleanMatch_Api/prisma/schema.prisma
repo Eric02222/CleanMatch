@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://root:861391@localhost:3306/cleanMatch"
+ 
 }
 
 //referencia
@@ -15,7 +15,7 @@ model Usuario {
   senha               String
   contato             Int
   tipo_conta          String
-  cep                 Int
+  cep                 String
   estado              String
   cidade              String
   valor_min           Int
