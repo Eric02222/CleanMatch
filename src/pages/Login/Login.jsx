@@ -29,7 +29,7 @@ export function Login() {
                 senha: senhaLogin
             }
 
-            const res = await axios.post(' http://localhost:4000/auth/login', data)
+            const res = await axios.post('http://localhost:4000/auth/login', data)
             const token = res.data.accessToken
             console.log(res)
 

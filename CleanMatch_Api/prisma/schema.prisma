@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
- 
+  url = "mysql://root:861391@localhost:3306/cleanMatch"
 }
 
 //referencia
@@ -18,6 +18,7 @@ model Usuario {
   cep                 String
   estado              String
   cidade              String
+  rua                 String
   valor_min           Int
   valor_max           Int
   cargaHoraria_inicio DateTime?
@@ -36,5 +37,5 @@ model token {
   expiresAt DateTime
   revoked   Boolean  @default(value: false)
   usuarioId Int
-  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 }

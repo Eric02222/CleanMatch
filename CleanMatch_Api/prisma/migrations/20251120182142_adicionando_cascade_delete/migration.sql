@@ -9,6 +9,7 @@ CREATE TABLE `usuario` (
     `cep` VARCHAR(191) NOT NULL,
     `estado` VARCHAR(191) NOT NULL,
     `cidade` VARCHAR(191) NOT NULL,
+    `rua` VARCHAR(191) NOT NULL,
     `valor_min` INTEGER NOT NULL,
     `valor_max` INTEGER NOT NULL,
     `cargaHoraria_inicio` DATETIME(3) NULL,
@@ -33,4 +34,4 @@ CREATE TABLE `token` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `token` ADD CONSTRAINT `token_usuarioId_fkey` FOREIGN KEY (`usuarioId`) REFERENCES `usuario`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `token` ADD CONSTRAINT `token_usuarioId_fkey` FOREIGN KEY (`usuarioId`) REFERENCES `usuario`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
