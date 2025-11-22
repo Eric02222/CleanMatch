@@ -3,26 +3,24 @@ import axios from 'axios';
 import { formatPhoneNumber, formatCepNumber, formatTime } from '../../Components/Formarte/Formarte.js';
 import { useAuth } from "../../contexts/AuthContext.jsx";
 import Aviso from '../../Components/Aviso/Aviso.jsx';
-// import UserIcon from '../assets/icons/user-icon.svg';
-
+import UserIcon from '../../assets/icons/user-icon.svg';
+import { Card } from '../../Components/CardUserHome/CardUserHome.jsx'
 
 export function Home() {
-
     const [usuarios, setUsuarios] = useState([]);
     const [selectedCard, setSelectedCard] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const { user } = useAuth();
     const [mostrarAviso, setMostrarAviso] = useState(false);
-    const [fotoPerfil, setfotoPerfil] = useState({});
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [itensPorPagina, setItensPorPagina] = useState(10);
     const token = user?.token;
-    // const defaultAvatar = UserIcon;
+    const defaultAvatar = UserIcon;
 
 
     const fetchUsuarios = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/usuarios', {
+            const response = await axios.get('http://localhost:4000/usuarios', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setUsuarios(response.data);
@@ -33,33 +31,6 @@ export function Home() {
 
     useEffect(() => {
         fetchUsuarios();
-
-
-    }, []);
-
-
-    const fetchfotosPerfil = async () => {
-        try {
-            const response = await axios.get('http://localhost:3000/usuarios', {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            const todasAsFotos = response.data;
-
-
-            const fotosMap = {}
-            todasAsFotos.forEach(foto => {
-                fotosMap[foto.usuarios_id] = foto.foto
-
-            })
-            setfotoPerfil(fotosMap);
-
-        } catch (error) {
-            console.error('Erro ao buscar Foto:', error);
-        }
-    };
-
-    useEffect(() => {
-        fetchfotosPerfil();
     }, []);
 
     useEffect(() => {
@@ -92,40 +63,20 @@ export function Home() {
         setPaginaAtual(1);
     }, [searchTerm, itensPorPagina]);
 
-
-    const Card = ({ data, onClick, isSelected, fotoUrl }) => {
-        return (
-            <div className={`card ${isSelected ? 'selected' : ''}`} onClick={onClick}>
-                <div className='elementos-card'>
-                    <img className="fotoUserHome" src={fotoUrl} alt="Avatar do Perfil" />
-                    <div className='basic_info'>
-                        <h2>{data.nome}</h2>
-                        <p><strong>Email:</strong> {data.email}</p>
-                        <p><strong>Localização:</strong> {data.cidade} | {data.estado}</p>
-                        <p><strong>Horário:</strong> {formatTime(data.cargaHoraria_inicio)} - {formatTime(data.cargaHoraria_fim)}</p>
-                        <div className='contianer-valorServico'>
-                            <p className="price-button"><strong>R$ {data.valor_min} - R$ {data.valor_max}</strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const usuariosVisiveis = usuarios.filter(user => {
-        if (user.tipo_conta !== 'Prestador/a de Serviço') return false;
+    const usuariosVisiveis = usuarios.filter(userVi => {
+        if (userVi.tipo_conta !== 'Prestador/a de Serviço') return false;
 
         const informacoesCompletas =
-            user.cargaHoraria_inicio &&
-            user.cargaHoraria_fim &&
-            user.valor_min &&
-            user.valor_max &&
-            user.cep &&
-            user.estado &&
-            user.cidade &&
-            user.rua &&
-            user.contato;
-        if (!informacoesCompletas && !(user && user.id === user.id)) {
+            userVi.cargaHoraria_inicio &&
+            userVi.cargaHoraria_fim &&
+            userVi.valor_min &&
+            userVi.valor_max &&
+            userVi.cep &&
+            userVi.estado &&
+            userVi.cidade &&
+            userVi.rua &&
+            userVi.contato;
+        if (!informacoesCompletas) {
             return false;
         }
 
@@ -133,10 +84,10 @@ export function Home() {
         if (termo === '') return true;
 
         return (
-            user.nome?.toLowerCase().includes(termo) ||
-            user.cidade?.toLowerCase().includes(termo) ||
-            user.estado?.toLowerCase().includes(termo) ||
-            user.rua?.toLowerCase().includes(termo)
+            userVi.nome?.toLowerCase().includes(termo) ||
+            userVi.cidade?.toLowerCase().includes(termo) ||
+            userVi.estado?.toLowerCase().includes(termo) ||
+            userVi.rua?.toLowerCase().includes(termo)
         );
     });
 
@@ -191,24 +142,36 @@ export function Home() {
 
                     <div className="card-list">
                         {usuariosDaPagina.map((user) => {
-                            const fotoUsuario = fotoPerfil[user.id_usuario] || defaultAvatar;
+                            const fotoUsuario = user.foto_perfil || defaultAvatar;
                             return (<Card
                                 key={user.id}
                                 data={user}
                                 onClick={() => handleCardClick(user)}
                                 isSelected={selectedCard === user}
+                                onClose={() => setSelectedCard(null)}
                                 fotoUrl={fotoUsuario}
                             />)
                         })}
                     </div>
 
                     {selectedCard && (() => {
-                        const fotoUrl = fotoPerfil[selectedCard.id_usuario] || defaultAvatar;
+                        const fotoUrl = selectedCard.foto_perfil || defaultAvatar;
 
                         return (
 
+
                             <div className='detalhe_usuarios'>
-                                <div className="card-details">
+                                <div className="fechar-container" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+
+                                    <div className="card-details">
+                                        <button
+                                            onClick={() => setSelectedCard(null)}
+                                            title="Fechar detalhes"
+                                        >
+                                            X
+                                        </button>
+                                    </div>
+
                                     <div className='detalhes-topo'>
                                         <img className="fotoUserdetalhes" src={fotoUrl} alt="Avatar do Perfil" />
                                         <div className='infos-topo'>

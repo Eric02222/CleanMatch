@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from "../../contexts/AuthContext"
-import { formatPhoneNumber, formatCepNumber, validarEmail } from '../../Components/Formarte/Formarte.js';
+import { formatPhoneNumber, formatCepNumber, validarEmail, formatCurrency } from '../../Components/Formarte/Formarte.js';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -78,6 +78,13 @@ function Perfil() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    let finalValue = value;
+
+    if (name === 'valor_min' || name === 'valor_max') {
+      finalValue = value === '' ? 0 : Number(value);
+    }
+
     setAccountData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -113,6 +120,18 @@ function Perfil() {
     }
   };
 
+  const handleMoneyChange = (e) => {
+    const { name, value } = e.target;
+
+    const onlyDigits = value.replace(/\D/g, '');
+    const numericValue = Number(onlyDigits) / 100;
+
+    setAccountData((prevData) => ({
+      ...prevData,
+      [name]: numericValue,
+    }));
+  };
+
   const handleEditClick = () => {
     setIsEditing(true);
     setOriginalAccountData(accountData);
@@ -142,25 +161,30 @@ function Perfil() {
         return;
       }
 
-      const response = await axios.put(
-        `http://localhost:4000/usuarios/${user.id}`,
-        accountData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          timeout: 5000 // Adiciona um timeout de 5 segundos para não travar eternamente
-        }
-      );
+      const dadosParaEnviar = {
+        ...accountData,
 
-      const novoUser = { ...accountData, token: token };
+        valor_min: Number(accountData.valor_min || 0).toFixed(2),
+        valor_max: Number(accountData.valor_max || 0).toFixed(2),
 
-      setUser(novoUser);
-      localStorage.setItem("user", JSON.stringify(novoUser));
+        contato: accountData.contato?.toString().replace(/\D/g, '') || "",
+        cep: accountData.cep?.toString().replace(/\D/g, '') || "",
+      };
 
-      setOriginalAccountData(accountData);
+      console.log("Enviando:", dadosParaEnviar);
+
+      await axios.put(`http://localhost:4000/usuarios/${user.id}`, dadosParaEnviar, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+
+      setUser({ ...dadosParaEnviar, token: token });
+      localStorage.setItem("user", JSON.stringify({ ...dadosParaEnviar, token: token }));
+
       setIsEditing(false);
       setShowSaveModal(false);
-
       toast.success('Dados salvos com sucesso!');
+      setOriginalAccountData(dadosParaEnviar);
 
     } catch (error) {
       toast.error('Erro ao salvar dados.');
@@ -230,7 +254,7 @@ function Perfil() {
           {accountData?.tipo_conta === 'Prestador/a de Serviço' && (
             <>
               <p>Horario: {accountData?.cargaHoraria_inicio} - {accountData?.cargaHoraria_fim}</p>
-              <p>Faixa de Preço: {accountData?.valor_min} - {accountData?.valor_max}</p>
+              <p>Faixa de Preço: {formatCurrency(accountData?.valor_min)} - {formatCurrency(accountData?.valor_max)}</p>
             </>
           )}
         </div>
@@ -370,23 +394,27 @@ function Perfil() {
             <div className="input-group">
               <label htmlFor="valor_min">Valor do Serviço Mínimo:</label>
               <input
-                type="number"
+                type="text"
                 id="valor_min"
                 name="valor_min"
-                value={accountData?.valor_min || ''}
-                onChange={handleInputChange}
+                value={formatCurrency(accountData?.valor_min) || ""}
+                onChange={handleMoneyChange}
                 readOnly={!isEditing}
+                maxLength="18"
+                placeholder="R$ 0,00"
               />
             </div>
             <div className="input-group">
               <label htmlFor="valor_max">Valor do Serviço Máximo:</label>
               <input
-                type="number"
+                type="text"
                 id="valor_max"
                 name="valor_max"
-                value={accountData?.valor_max || ''}
-                onChange={handleInputChange}
+                value={formatCurrency(accountData?.valor_max) || ""}
+                onChange={handleMoneyChange}
                 readOnly={!isEditing}
+                maxLength="18"
+                placeholder="R$ 0,00"
               />
             </div>
             <div className="input-group">

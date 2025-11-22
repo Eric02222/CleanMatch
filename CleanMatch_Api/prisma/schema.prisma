@@ -13,16 +13,16 @@ model Usuario {
   nome                String    @db.VarChar(100)
   email               String    @unique @db.VarChar(100)
   senha               String
-  contato             Int
+  contato             String       
   tipo_conta          String
   cep                 String
   estado              String
   cidade              String
   rua                 String
-  valor_min           Int
-  valor_max           Int
-  cargaHoraria_inicio DateTime?
-  cargaHoraria_fim    DateTime?
+  valor_min           String
+  valor_max           String
+  cargaHoraria_inicio String
+  cargaHoraria_fim    String
   descricao           String    @db.VarChar(500)
   foto_perfil         String?   @db.LongText
   tokens              token[]

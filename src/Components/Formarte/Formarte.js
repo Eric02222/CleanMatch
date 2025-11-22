@@ -38,3 +38,15 @@ export const formatTime = (timeString) => {
     }
     return timeString;
 };
+
+export const formatCurrency = (value) => {
+    if (value === '' || value === null || value === undefined) return '';
+
+    const numberValue = Number(value);
+    if (isNaN(numberValue)) return '';
+
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(numberValue);
+};
