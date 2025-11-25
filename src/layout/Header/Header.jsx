@@ -5,40 +5,17 @@ import Botao_cadastro from "../../Components/BotaoCadastro/BotaoCadastro.jsx"
 import { useState, useEffect } from 'react'
 import { useAuth } from "../../contexts/AuthContext.jsx"
 import axios from 'axios';
-// import UserIcon from '../assets/icons/user-icon.svg';
+import UserIcon from '../../assets/icons/user-icon.svg';
 
 
 export function Header() {
   const { user } = useAuth()
-  const [fotoPerfil, setfotoPerfil] = useState(null)
+  const fotoUsuario = user?.foto_perfil || UserIcon;
 
-  // const defaultAvatar = UserIcon;
-
-  const fetchfotosPerfil = async () => {
-    if (!user || !user.email) return;
-
-    try {
-      const response = await axios.get('http://localhost:4000/usuario', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const todasAsFotos = response.data.foto_perfil;
-      const fotoDoUsuario = todasAsFotos.find(foto => foto.id === user.id);
-
-      if (fotoDoUsuario) {
-        setfotoPerfil(fotoDoUsuario);
-
-      } else {
-        setfotoPerfil(null);
-      }
-
-    } catch (error) {
-      console.error('Erro ao buscar Foto:', error);
-    }
+  const handleImageError = (e) => {
+      e.target.onerror = null;
+      e.target.src = UserIcon;
   };
-
-  useEffect(() => {
-    fetchfotosPerfil();
-  }, []);
 
   return (
     <div className="container_navbar">
@@ -62,8 +39,7 @@ export function Header() {
               )}
             {user ? (
               <div className="container_perfil">
-                <img className="inconePerfil"  alt="Avatar do Perfil" />
-                {/* src={fotoPerfil ? fotoPerfil.foto : defaultAvatar}    src da img acima */}
+                <img className="fotoUserdetalhes" src={fotoUsuario} onError={handleImageError} alt="Avatar do Perfil" />
                 <Link to="/Perfil">Perfil</Link>
               </div>
             ) : (
