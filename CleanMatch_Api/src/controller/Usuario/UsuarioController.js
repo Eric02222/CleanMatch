@@ -51,7 +51,18 @@ class UsuarioController {
                     nome: body.nome,
                     email: body.email,
                     senha: body.senha,
-                    tipo_conta: body.tipo_conta
+                    tipo_conta: body.tipo_conta,
+                    contato: "", 
+                    cep: "", 
+                    estado: "", 
+                    cidade: "", 
+                    rua: "", 
+                    valor_min: "", 
+                    valor_max: "", 
+                    cargaHoraria_inicio: '', 
+                    cargaHoraria_fim: '', 
+                    descricao: "", 
+                    foto_perfil: 'teste' 
                 },
             })
             return res.status(201).json(usuario)

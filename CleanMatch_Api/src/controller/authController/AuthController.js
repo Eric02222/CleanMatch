@@ -27,9 +27,12 @@ class AuthController {
             if (existingUser) {
                 return res.status(409).json({ error: "Usuário já existe" });
             }
+            console.log(senha)
+
             // Hash da senha com bcrypt
             const saltRounds = 10;
             const hashedsenha = await bcrypt.hash(senha, saltRounds);
+            console.log(hashedsenha)
             // Criar usuário no banco de dados
             const usuario = await prismaClient.usuario.create({
                 data: { nome: nome, email: email, senha: hashedsenha, tipo_conta: tipo_conta, contato: contato, cep: cep, estado: estado, cidade: cidade,rua: rua,  valor_min:valor_min, valor_max: valor_max, cargaHoraria_inicio: cargaHoraria_inicio, cargaHoraria_fim: cargaHoraria_fim, descricao: descricao, foto_perfil: foto_perfil || null },
