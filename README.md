@@ -22,17 +22,18 @@ Será um aplicativo para facilitar o encontro de pessoas que prestam serviço de
 
 # Comando para intalações de bibliotecas obrigatorias front end: 
 -React-Toastify: npm i --save react-toastify  
--react-dom  
--react-router  
+-react-dom: npm i react-dom    
+-react-router: npm i react-router-dom   
 -tailwind: npm install tailwindcss @tailwindcss/vite  
 -Jest: npm install --save-dev jest  
--react-icons
 
 # Comando para intalações de bibliotecas obrigatorias back end: 
 -Express: npm install express --save  
 -Prisma: npx prisma init --db  
 -Jest: npm install --save-dev jest   
--jsonwebtoken  
--bcrypt  
--dotenv  
--nodemon  
+-jsonwebtoken: npm i jsonwebtoken   
+-bcrypt: npm i bcrypt   
+-dotenv: npm i dotenv  
+-nodemon: npm i swagger-ui-express --save-dev  
+-supertest: npm i -D nodemon   
+-swagger-ui-express: npm i -D supertest  
