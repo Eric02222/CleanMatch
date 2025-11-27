@@ -5,7 +5,6 @@ Trabalho da Situação de Aprendizagem do segundo semestre do curso técnico de 
 - [Eric Mara de Oliveira](https://github.com/Eric02222);
 - [Vitor Carlos Souza da Rocha Pinto](https://github.com/OracleThe61);
 - [Bryan Demis Alves de Andrade](https://github.com/brryan64d);
-- [Francisco Ulisses](https://github.com/ulissessantos95);
 - [Nicolas Corrêa Gubert](https://github.com/correagubert);
   
 # TEMA: Aplicativo de serviço de limpeza
