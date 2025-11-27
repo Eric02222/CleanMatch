@@ -20,20 +20,34 @@ Será um aplicativo para facilitar o encontro de pessoas que prestam serviço de
 -Filtrar prestadores de serviço próximo a sua região.  
 -Capacidade de solicitação dos clientes para prestadores de serviços atenderem.  
 
-# Comando para intalações de bibliotecas obrigatorias front end: 
--React-Toastify: npm i --save react-toastify  
--react-dom: npm i react-dom    
--react-router: npm i react-router-dom   
--tailwind: npm install tailwindcss @tailwindcss/vite  
--Jest: npm install --save-dev jest  
+# Comandos para instalação de bibliotecas obrigatórias (back-end):
+- React-Router:
+`npm i react-dom`
+- React-Router:
+`npm i react-router-dom`
+- TailwindCSS:
+`npm i --save tailwindcss @tailwindcss/vite`
+- Jest:
+`npm i --save-dev jest`
+- React-Icons:
+`npm i --save react icons`
+- React-Toastify: 
+`npm i --save react-toastify`
 
-# Comando para intalações de bibliotecas obrigatorias back end: 
--Express: npm install express --save  
--Prisma: npx prisma init --db  
--Jest: npm install --save-dev jest   
--jsonwebtoken: npm i jsonwebtoken   
--bcrypt: npm i bcrypt   
--dotenv: npm i dotenv  
--nodemon: npm i swagger-ui-express --save-dev  
--supertest: npm i -D nodemon   
--swagger-ui-express: npm i -D supertest  
+# Comandos para instalação de bibliotecas obrigatórias (front-end):
+- Express:
+`npm i express --save`
+- Prisma:
+`npx prisma init --db`
+- jsonwebtoken:
+`npm i --save-dev jsonwebtoken`
+- Bcrypt:
+`npm i --save bcrypt`
+- dotenv:
+`npm i dotenv --save`
+- Nodemon:
+`npm i --save-dev nodemon`
+- Supertest:
+`npm i -D nodemon`
+- swagger-ui-express:
+`npm i -D supertest`
