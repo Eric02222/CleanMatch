@@ -72,25 +72,27 @@ export function Cadastro() {
 
 
     return (
-        <div className='container-cadastro'>
+        <div className="flex items-center justify-center flex-col gap-[20px] min-h-screen bg-[#20c997]">
+            <main className="flex bg-white w-[50vh] h-[73vh] items-center justify-center rounded-[10px] drop-shadow-[25px_25px_4.5px_rgba(90,86,90,0.2)] flex-col">
+
             <div>
-                <h1 className='titulo_cadastro'>Cadastro</h1>
+                <h1 className="text-[40px] font-bold">Cadastro</h1>
             </div>
 
-            <form onSubmit={cadastro} className='container_conteudos_cadastro'>
-                <div className='inputs-cadastro'>
+            <form onSubmit={cadastro} className="flex flex-col items-center justify-center min-w-[250px] gap-[30px]">
+                <div className="flex items-center justify-center flex-col w-[350px] gap-[10px]">
 
-                    <label htmlFor="input-email" className='label-emailCad'>Nome</label>
-                    <input type="text" className='input-email' value={nome} onChange={(event) => setNome(event.target.value)} required />
+                    <label htmlFor="input-email" className="text-[20px] self-start pl-[5%]">Nome</label>
+                    <input type="text" className="bg-transparent border-b-2 border-[#242424] pl-[2%] mb-[10px] h-[35px] w-full text-[18px] outline-none transition duration-300 focus:border-[#20c997]" value={nome} onChange={(event) => setNome(event.target.value)} required />
 
-                    <label htmlFor="input-email" className='label-emailCad'>Email</label>
-                    <input type="text" className='input-email' value={email} onChange={(event) => setEmail(event.target.value)} required />
+                    <label htmlFor="input-email" className="text-[20px] self-start pl-[5%]">Email</label>
+                    <input type="text" className="bg-transparent border-b-2 border-[#242424] pl-[2%] mb-[10px] h-[35px] w-full text-[18px] outline-none transition duration-300 focus:border-[#20c997]" value={email} onChange={(event) => setEmail(event.target.value)} required />
 
-                    <label htmlFor="input-senha" className='label-senhaCad'>Senha</label>
-                    <input type="password" className='input-senha' value={senha} onChange={(event) => setSenha(event.target.value)} required minLength={8} />
+                    <label htmlFor="input-senha" className="text-[20px] self-start pl-[5%]">Senha</label>
+                    <input type="password" className="bg-transparent border-b-2 border-[#242424] pl-[2%] mb-[10px] h-[35px] w-full text-[18px] outline-none transition duration-300 focus:border-[#20c997]" value={senha} onChange={(event) => setSenha(event.target.value)} required minLength={8} />
 
-                    <label htmlFor="input-coSenha" className='label-coSenhaCad'>Confirmar Senha</label>
-                    <input type="password" className='input-coSenha' value={vaSenha} onChange={(event) => setVaSenha(event.target.value)} required minLength={8} />
+                    <label htmlFor="input-coSenha" className="text-[20px] self-start pl-[5%]">Confirmar Senha</label>
+                    <input type="password" className="bg-transparent border-b-2 border-[#242424] pl-[2%] mb-[10px] h-[35px] w-full text-[18px] outline-none transition duration-300 focus:border-[#20c997]" value={vaSenha} onChange={(event) => setVaSenha(event.target.value)} required minLength={8} />
 
                     {!isPasswordMatch && (
                         <p className='text-red-500 text-sm mt-1 text-center'>Senhas não correspodem</p>
@@ -98,13 +100,13 @@ export function Cadastro() {
 
                 </div>
 
-                <div className='inputs-tipo-conta'>
-                    <div className='input-tipo-cliente'>
+                <div className="flex items-center justify-center gap-[50px]">
+                    <div className='input-tipo-cliente flex items-center gap-2'>
                         <input type="radio" id='cliente' className='cliente' name='escolha' value='Cliente' onChange={(event) => setTipoConta(event.target.value)} checked={tipoConta === 'Cliente'} />
                         <label htmlFor="cliente">Cliente</label>
                     </div>
 
-                    <div className='input-tipo-prestadorSe'>
+                    <div className='input-tipo-prestadorSe flex items-center gap-2'>
                         <input type="radio" id='prestador-servico' className='prestador-servico' value='Prestador/a de Serviço' onChange={(event) => setTipoConta(event.target.value)} name='escolha' checked={tipoConta === 'Prestador/a de Serviço'} />
                         <label htmlFor="prestador-servico">Prestador/a de Serviço</label>
                     </div>
@@ -113,14 +115,15 @@ export function Cadastro() {
                 </div>
 
 
-                <div className='irPg_Login'>
+                <div className="flex flex-col justify-center items-center cursor-pointer">
                     <label type="submit" onClick={() => navigate('/Login')}>Já tem uma conta?</label>
                 </div>
 
-                <div className='container_bnt_cadastro'>
+                <div className="flex items-center justify-center rounded-[3px] bg-[#20c997] text-white font-bold text-[25px] h-[45px] w-[220px] transition duration-300 hover:bg-[aliceblue] hover:text-black hover:border hover:border-[#20c997]">
                     <button type="submit" disabled={isSaving} className='botao-cadastro'>{isSaving ? 'Salvando' : 'Cadastrar'}</button>
                 </div>
             </form>
+            </main>
 
         </div>
     )

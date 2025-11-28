@@ -2,9 +2,8 @@ import { Link } from "react-router-dom"
 import Botao_logout from "../../Components/BotaoLogout/BotaoLogout.jsx"
 import Botao_login from "../../Components/BotaoLogin/BotaoLogin.jsx"
 import Botao_cadastro from "../../Components/BotaoCadastro/BotaoCadastro.jsx"
-import { useState, useEffect } from 'react'
 import { useAuth } from "../../contexts/AuthContext.jsx"
-import axios from 'axios';
+import HomeIcon from "../../assets/icons/house.svg"
 import UserIcon from '../../assets/icons/user-icon.svg';
 
 
@@ -19,14 +18,17 @@ export function Header() {
 
   return (
     <div className="container_navbar">
-      <main>
-        <header className="navbar">
+      <main className="flex items-center justify-center fixed top-0 left-0 w-full bg-[#20c997] h-[60px] z-[1]">
+        <header className="flex justify-between items-center text-white w-full max-w-[1850px] px-[20px]">
           <div>
-            <Link to="/">Home</Link>
+            <Link to="/" className="flex gap-3">
+              <img src={HomeIcon} href="" /> 
+              <label className="hover:cursor-pointer font-bold text-lg">Home</label>
+            </Link>
           </div>
 
 
-          <div className="opcoes_perfil">
+          <div className="flex items-center gap-[20px]">
             {user ? (
               <Botao_logout />
 
@@ -38,8 +40,8 @@ export function Header() {
                 </>
               )}
             {user ? (
-              <div className="container_perfil">
-                <img className="fotoUserdetalhes" src={fotoUsuario} onError={handleImageError} alt="Avatar do Perfil" />
+              <div className="flex items-center justify-center gap-[10px]">
+                <img className="w-[4vh] rounded-full object-cover bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" src={fotoUsuario} onError={handleImageError} alt="Avatar do Perfil" />
                 <Link to="/Perfil">Perfil</Link>
               </div>
             ) : (

@@ -103,23 +103,23 @@ export function Home() {
 
 
     return (
-        <div className="container_home">
+        <div className="flex flex-col min-h-screen">
 
             {user && mostrarAviso && (
-                <div className='aviso'>
+                <div className="flex items-center justify-center mt-[90px] mx-auto mb-[-60px]">
                     <Aviso />
                 </div>
             )}
 
-            <div className='corpo_home'>
-                <div className='conteudo_topo'>
-                    <div className='input_pesquisa'>
+            <div className="flex flex-col items-center p-[80px] flex-grow">
+                <div className="flex flex-col justify-center w-full max-w-[1200px]">
+                    <div className="flex gap-[10px] mb-[20px] mx-auto w-full max-w-[1100px] bg-white p-[10px] rounded-[8px] shadow-[0_2px_5px_rgba(0,0,0,0.1)]">
                         <input
                             type="text"
                             placeholder="Buscar por nome, cidade ou estado"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="search-bar"
+                            className="border-none outline-none p-[5px] text-[1em] w-full placeholder:text-[#999]"
                         />
                     </div>
 
