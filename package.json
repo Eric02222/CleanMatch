@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test-mod": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.12",
