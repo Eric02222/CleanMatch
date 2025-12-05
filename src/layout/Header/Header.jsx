@@ -12,8 +12,8 @@ export function Header() {
   const fotoUsuario = user?.foto_perfil || UserIcon;
 
   const handleImageError = (e) => {
-      e.target.onerror = null;
-      e.target.src = UserIcon;
+    e.target.onerror = null;
+    e.target.src = UserIcon;
   };
 
   return (
@@ -22,7 +22,7 @@ export function Header() {
         <header className="flex justify-between items-center text-white w-full max-w-[1850px] px-[20px]">
           <div>
             <Link to="/" className="flex gap-3">
-              <img src={HomeIcon} href="" /> 
+              <img src={HomeIcon} />
               <label className="hover:cursor-pointer font-bold text-lg">Home</label>
             </Link>
           </div>
@@ -41,8 +41,11 @@ export function Header() {
               )}
             {user ? (
               <div className="flex items-center justify-center gap-[10px]">
-                <img className="w-[4vh] rounded-full object-cover bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]" src={fotoUsuario} onError={handleImageError} alt="Avatar do Perfil" />
-                <Link to="/Perfil">Perfil</Link>
+                <Link to="/Perfil"  className="flex gap-3">
+                  <img className="w-[4vh] rounded-full object-cover bg-gray-500 shadow-[0_0_10px_rgba(255,255,255,0.5)]" src={fotoUsuario} onError={handleImageError} alt="Avatar do Perfil" />
+                  <label className="hover:cursor-pointer  text-lg">Perfil</label>
+                </Link>
+
               </div>
             ) : (
               <label htmlFor=""></label>

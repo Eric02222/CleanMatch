@@ -229,242 +229,270 @@ function Perfil() {
       ...prevData,
       tipo_conta: newType,
       ...(newType === 'Cliente' && {
-        cargaHoraria_inicio: null,
-        cargaHoraria_fim: null,
-        valor_max: null,
-        valor_min: null,
-        descricao: null,
+        cargaHoraria_inicio: "",
+        cargaHoraria_fim: "",
+        valor_max: "",
+        valor_min: "",
+        descricao: "",
       })
     }));
   };
 
   return (
-    <div className="container-perfil">
-      <div className="perfil-dados">
-        <div className="img_perfil">
+    <div className="flex flex-col text-[rgb(248,241,241)] font-sans pt-[55px]">
+
+      {/* SEÇÃO DO PERFIL */}
+      <div className="
+      flex flex-col md:flex-row 
+      bg-[#20c997] 
+      w-full 
+      items-center md:items-start 
+      justify-center md:justify-start 
+      gap-6 md:gap-[90px] 
+      pt-6 md:pt-[2vh] 
+      px-6 md:pl-[7vw] 
+      shadow-[0_2px_5px_rgba(0,0,0,0.1)]
+      h-auto md:h-[55vh]
+  ">
+
+        {/* FOTO */}
+        <div className="w-[150px] h-[150px] md:w-auto md:h-auto flex-shrink-0">
           <Foto_de_perfil />
         </div>
 
-        <div className='dados_usuario'>
-          <h2 className="nome">{accountData?.nome}</h2>
-          <p>Email: {accountData?.email}</p>
-          <p>Contato: {displayContato}</p>
-          <p>Estado: {accountData?.estado}</p>
-          <p>Cidade: {accountData?.cidade}</p>
+        {/* INFO DO USUÁRIO */}
+        <div className="text-center md:text-left mt-12 pb-3  md:mt-5">
+          <h2 className="font-bold text-[4vh] md:text-[6vh]">{accountData?.nome}</h2>
+          <p className="text-[18px] md:text-[30px]">
+            <span className="font-bold">Email:</span> {accountData?.email}
+          </p>
+
+          <p className="text-[18px] md:text-[30px]">
+            <span className="font-bold">Contato:</span> {displayContato}
+          </p>
+
+          <p className="text-[18px] md:text-[30px]">
+            <span className="font-bold">Estado:</span> {accountData?.estado}
+          </p>
+
+          <p className="text-[18px] md:text-[30px]">
+            <span className="font-bold">Cidade:</span> {accountData?.cidade}
+          </p>
+
           {accountData?.tipo_conta === 'Prestador/a de Serviço' && (
             <>
-              <p>Horario: {accountData?.cargaHoraria_inicio} - {accountData?.cargaHoraria_fim}</p>
-              <p>Faixa de Preço: {formatCurrency(accountData?.valor_min)} - {formatCurrency(accountData?.valor_max)}</p>
+              <p className="text-[18px] md:text-[30px]"><span className="font-bold">Horario:</span> {accountData?.cargaHoraria_inicio} - {accountData?.cargaHoraria_fim}</p>
+              <p className="text-[18px] md:text-[30px]"> <span className="font-bold">Faixa de Preço:</span> {formatCurrency(accountData?.valor_min)} - {formatCurrency(accountData?.valor_max)}</p>
             </>
           )}
         </div>
       </div>
 
-      <div className="detalhes_conta">
-        <div className='titulo'>
-          <h1>Detalhes da Conta</h1>
+      {/* FORMULÁRIO DE DETALHES */}
+      <div className="
+      grid 
+      grid-cols-1 sm:grid-cols-2 
+      mx-auto my-8 
+      text-[#0d0d0d] 
+      gap-y-6 gap-x-10 
+      w-[90vw] sm:w-[85vw] md:w-[80vw] 
+      p-6 
+      bg-[#fefefe] 
+      rounded-[8px] 
+      shadow-[0_4px_10px_rgba(0,0,0,0.1)]
+  ">
+
+        <div className="col-span-full text-center mb-4">
+          <h1 className="text-[28px] md:text-[40px]">Detalhes da Conta</h1>
         </div>
 
-        <div className="input-group">
-          <label htmlFor="tipo_conta">Tipo de Conta:</label>
-          <select
-            id="tipo_conta"
-            name="tipo_conta"
-            value={accountData?.tipo_conta || ''}
-            onChange={handleTypeChange}
-            disabled={!isEditing}
-          >
-            <option value="Cliente">Cliente</option>
-            <option value="Prestador/a de Serviço">Prestador/a de Serviço</option>
-          </select>
-        </div>
+        {/* CAMPO - REAPROVEITADO POR TODOS OS INPUTS */}
+        {[
+          {
+            id: "tipo_conta",
+            label: "Tipo de Conta:",
+            element: (
+              <select
+                id="tipo_conta"
+                className="input-base"
+                value={accountData?.tipo_conta || ''}
+                onChange={handleTypeChange}
+                disabled={!isEditing}
+              >
+                <option value="Cliente">Cliente</option>
+                <option value="Prestador/a de Serviço">Prestador/a de Serviço</option>
+              </select>
+            )
+          },
+          {
+            id: "nome",
+            label: "Nome:",
+            element: (
+              <input
+                type="text"
+                name="nome"
+                id="nome_detalhes"
+                className="input-base"
+                value={accountData?.nome || ''}
+                onChange={handleInputChange}
+                readOnly={!isEditing}
+              />
+            )
+          },
+          {
+            id: "email",
+            label: "E-mail:",
+            element: (
+              <input
+                type="email"
+                name="email"
+                id="email"
+                className="input-base"
+                value={accountData?.email || ''}
+                onChange={handleInputChange}
+                readOnly={!isEditing}
+              />
+            )
+          },
+          {
+            id: "contato",
+            label: "Contato:",
+            element: (
+              <input
+                type="text"
+                name='contato'
+                id="contato"
+                className="input-base"
+                value={displayContato || ''}
+                onChange={handleContactChange}
+                readOnly={!isEditing}
+                maxLength="15"
+              />
+            )
+          },
+          {
+            id: "cep",
+            label: "CEP:",
+            element: (
+              <input
+                id="cep"
+                name='cep'
+                className="input-base"
+                value={displayCep || ''}
+                onChange={handleCepChange}
+                readOnly={!isEditing}
+                maxLength="9"
+              />
+            )
+          },
+          {
+            id: "estado",
+            label: "Estado:",
+            element: (
+              <input
+                id="estado"
+                name='estado'
+                className="input-base"
+                value={accountData?.estado || ''}
+                onChange={handleInputChange}
+                readOnly={!isEditing}
+              />
+            )
+          },
+          {
+            id: "cidade",
+            label: "Cidade:",
+            element: (
+              <input
+                id="cidade"
+                name='cidade'
+                className="input-base"
+                value={accountData?.cidade || ''}
+                onChange={handleInputChange}
+                readOnly={!isEditing}
+              />
+            )
+          },
+          {
+            id: "rua",
+            label: "Rua:",
+            element: (
+              <input
+                id="rua"
+                name='rua'
+                className="input-base"
+                value={accountData?.rua || ''}
+                onChange={handleInputChange}
+                readOnly={!isEditing}
+              />
+            )
+          }
+        ].map((field) => (
+          <div key={field.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 pr-2">
+            <label className="text-[16px] md:text-[18px] font-bold sm:mr-[10px] w-full sm:w-[250px]">
+              {field.label}
+            </label>
+            {field.element}
+          </div>
+        ))}
 
-        <div className="input-group">
-          <label htmlFor="nome">Nome:</label>
-          <input
-            type="text"
-            id="nome_detalhes"
-            name="nome"
-            value={accountData?.nome || ''}
-            onChange={handleInputChange}
-            readOnly={!isEditing}
-          />
-        </div>
-
-        {/* ... Restante dos inputs ... */}
-
-        <div className="input-group">
-          <label htmlFor="email">E-mail:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={accountData?.email || ''}
-            onChange={handleInputChange}
-            readOnly={!isEditing}
-          />
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="contato">Contato:</label>
-          <input
-            type="text"
-            id="contato"
-            name="contato"
-            value={displayContato || ''}
-            onChange={handleContactChange}
-            readOnly={!isEditing}
-            maxLength="15"
-          />
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="cep">CEP:</label>
-          <input
-            type="text"
-            id="cep"
-            name="cep"
-            value={displayCep || ''}
-            onChange={handleCepChange}
-            readOnly={!isEditing}
-            maxLength="9"
-          />
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="estado">Estado:</label>
-          <input
-            type="text"
-            id="estado"
-            name="estado"
-            value={accountData?.estado || ''}
-            onChange={handleInputChange}
-            readOnly={!isEditing}
-          />
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="cidade">Cidade:</label>
-          <input
-            type="text"
-            id="cidade"
-            name="cidade"
-            value={accountData?.cidade || ''}
-            onChange={handleInputChange}
-            readOnly={!isEditing}
-          />
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="rua">Rua:</label>
-          <input
-            type="text"
-            id="rua"
-            name="rua"
-            value={accountData?.rua || ''}
-            onChange={handleInputChange}
-            readOnly={!isEditing}
-          />
-        </div>
-
-        {accountData?.tipo_conta === 'Prestador/a de Serviço' && (
+        {/* CAMPOS EXTRAS PARA PRESTADOR */}
+        {accountData?.tipo_conta === "Prestador/a de Serviço" && (
           <>
-            <div className="input-group">
-              <label htmlFor="cargaHoraria_inicio">Carga Horária Início:</label>
-              <input
-                type="time"
-                id="cargaHoraria_inicio"
-                name="cargaHoraria_inicio"
-                value={accountData?.cargaHoraria_inicio || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pr-2">
+              <label className="label" id="cargaHoraria_inicio">Carga Horária Início:</label>
+              <input type="time" name='cargaHoraria_inicio' id="cargaHoraria_inicio" className="input-base " value={accountData?.cargaHoraria_inicio || ''} onChange={handleInputChange} readOnly={!isEditing} />
             </div>
-            <div className="input-group">
-              <label htmlFor="cargaHoraria_fim">Carga Horária Fim:</label>
-              <input
-                type="time"
-                id="cargaHoraria_fim"
-                name="cargaHoraria_fim"
-                value={accountData?.cargaHoraria_fim || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
+
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pr-2">
+              <label className="label" id="cargaHoraria_fim">Carga Horária Fim:</label>
+              <input type="time" name='cargaHoraria_fim' id="cargaHoraria_fim" className="input-base" value={accountData?.cargaHoraria_fim || ''} onChange={handleInputChange} readOnly={!isEditing} />
             </div>
-            <div className="input-group">
-              <label htmlFor="valor_min">Valor do Serviço Mínimo:</label>
-              <input
-                type="text"
-                id="valor_min"
-                name="valor_min"
-                value={formatCurrency(accountData?.valor_min) || ""}
-                onChange={handleMoneyChange}
-                readOnly={!isEditing}
-                maxLength="18"
-                placeholder="R$ 0,00"
-              />
+
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pr-2">
+              <label className="label" id='valor_min'>Valor Mínimo:</label>
+              <input id="valor_min" name="valor_min" className="input-base" value={formatCurrency(accountData?.valor_min)} onChange={handleMoneyChange} readOnly={!isEditing} maxLength="18" />
             </div>
-            <div className="input-group">
-              <label htmlFor="valor_max">Valor do Serviço Máximo:</label>
-              <input
-                type="text"
-                id="valor_max"
-                name="valor_max"
-                value={formatCurrency(accountData?.valor_max) || ""}
-                onChange={handleMoneyChange}
-                readOnly={!isEditing}
-                maxLength="18"
-                placeholder="R$ 0,00"
-              />
+
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pr-2">
+              <label className="label" id='valor_max'>Valor Máximo:</label>
+              <input id="valor_max" name='valor_max' className="input-base" value={formatCurrency(accountData?.valor_max)} onChange={handleMoneyChange} readOnly={!isEditing} maxLength="18" />
             </div>
-            <div className="input-group">
-              <label htmlFor="descricao">Descrição:</label>
-              <textarea
-                id="descricao"
-                name="descricao"
-                value={accountData?.descricao || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-                rows="4"
-              ></textarea>
+
+            <div className="flex flex-col sm:flex-row items-start justify-end gap-2 pr-2">
+              <label className="label" id='descricao'>Descrição:</label>
+              <textarea id="descricao" name='descricao' maxlength="500" className="input-base min-h-[80px]" value={accountData?.descricao || ''} onChange={handleInputChange} readOnly={!isEditing} />
             </div>
           </>
         )}
 
-        <div className="button-group">
+        {/* BOTÕES */}
+        <div className="col-span-full flex flex-wrap items-center justify-center gap-6 py-4">
+
           {!isEditing ? (
             <>
-              <button onClick={handleEditClick} className="edit-button">
-                Editar
-              </button>
-              <button onClick={handleDeleteClick} className="delete-button">
-                Excluir Conta
-              </button>
+              <button onClick={handleEditClick} className="btn-primary w-[120px]">Editar</button>
+              <button onClick={handleDeleteClick} className="btn-danger px-5 py-2 min-w-[140px]">Excluir Conta</button>
             </>
           ) : (
             <>
-              <button onClick={handleSaveClick} className="save-button">
-                Salvar Edição
-              </button>
-              <button onClick={handleCancelEdit} className="cancel-button">
-                Cancelar Edição
-              </button>
+              <button onClick={handleSaveClick} className="btn-primary w-[150px]">Salvar Edição</button>
+              <button onClick={handleCancelEdit} className="btn-danger w-[180px]">Cancelar Edição</button>
             </>
           )}
+
         </div>
 
+        {/* MODAIS */}
+        {/* (não modifiquei—funcionam em todas telas automaticamente) */}
         {showDeleteModal && (
           <div className="modal-overlay">
-            <div className="modal">
+            <div className="modal-box">
               <h3>Confirmar Exclusão</h3>
-              <p>Tem certeza que deseja excluir sua conta? Esta ação é irreversível.</p>
-              <div className="modal-actions">
-                <button type="button" onClick={confirmDelete} className="confirm-button">
-                  Sim, Deletar
-                </button>
-                <button type="button" onClick={cancelDelete} className="cancel-button">
-                  Cancelar
-                </button>
+              <p>Tem certeza que deseja excluir sua conta?</p>
+              <div className="flex gap-4 pt-4">
+                <button onClick={confirmDelete} className="btn-primary">Sim, Deletar</button>
+                <button onClick={cancelDelete} className="btn-danger">Cancelar</button>
               </div>
             </div>
           </div>
@@ -472,16 +500,12 @@ function Perfil() {
 
         {showSaveModal && (
           <div className="modal-overlay">
-            <div className="modal">
+            <div className="modal-box">
               <h3>Salvar Alterações</h3>
-              <p>Deseja salvar as alterações na sua conta?</p>
-              <div className="modal-actions">
-                <button type="button" onClick={confirmSave} className="confirm-button">
-                  Sim, Salvar
-                </button>
-                <button type="button" onClick={cancelSave} className="cancel-button">
-                  Continuar Editando
-                </button>
+              <p>Deseja salvar as alterações?</p>
+              <div className="flex gap-4 pt-4">
+                <button onClick={confirmSave} className="btn-primary">Sim, Salvar</button>
+                <button onClick={cancelSave} className="btn-danger">Continuar Editando</button>
               </div>
             </div>
           </div>
@@ -489,6 +513,7 @@ function Perfil() {
 
       </div>
     </div>
+
   );
 }
 

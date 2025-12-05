@@ -75,49 +75,46 @@ function Foto_de_perfil() {
     };
 
     const handleImageError = (e) => {
-        e.target.onerror = null; 
+        e.target.onerror = null;
         e.target.src = UserIcon || BACKUP_AVATAR_URL;
     };
 
     return (
-        <div className='container_fotoPerfil' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+        <div className="flex flex-col justify-center items-center gap-3 py-10">
 
             {/* Área da Imagem */}
-            <div className="img-wrapper">
-                <img
-                    id="img-perfil"
-                    src={fotoPreview || defaultAvatar}
-                    alt="Avatar do Perfil"
-                    onError={handleImageError}
-                    style={{
-                        width: '150px',
-                        height: '150px',
-                        borderRadius: '50%',
-                        objectFit: 'cover',
-                        border: '2px solid #ccc',
-                        backgroundColor: '#434343ff'
-                    }}
-                />
-            </div>
+            <img
+                id="img-perfil"
+                src={fotoPreview || defaultAvatar}
+                alt="Avatar do Perfil"
+                onError={handleImageError}
+                className="
+        w-[150px] h-[150px]
+        md:w-[220px] md:h-[220px]
+        lg:w-[320px] lg:h-[320px]
+        rounded-full object-cover border-2 border-[#ccc] bg-[#434343]"
+            />
 
             {/* Botão/Input */}
-            <div className='espaço_input'>
+            <div className="flex flex-col items-center text-center">
                 <label
                     htmlFor="inputFoto"
-                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                    className="font-bold text-[18px] mt-[-10px] md:text-[22px] cursor-pointer transition duration-300 hover:scale-110"
                 >
                     Alterar Foto
                 </label>
+
                 <input
                     type="file"
                     id="inputFoto"
-                    className='inputFoto'
+                    className="hidden"
                     accept="image/*"
                     onChange={enviar_foto}
-                    style={{ display: 'none' }}
                 />
+                
             </div>
         </div>
+
     )
 }
 

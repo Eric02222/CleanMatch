@@ -91,45 +91,100 @@ export function Login() {
 
 
     return (
-        <div className="flex items-center justify-center flex-col min-h-screen text-black gap-[50px] bg-[#20c997]">
-            <main className="flex bg-white w-[50vh] h-[55vh] items-center justify-center rounded-[10px] drop-shadow-[25px_25px_4.5px_rgba(90,86,90,0.2)]">
+        <div className="flex items-center justify-center flex-col min-h-screen text-black bg-[#20c997] p-4">
 
-            <form onSubmit={handleLogin} >
+            {/* CAIXA BRANCA ALTA / RESPONSIVA */}
+            <main
+                className="
+                    flex flex-col
+                    bg-white
+                    w-full
+                    max-w-[400px]            /* largura proporcional */
+                    min-h-[50vh]             /* altura mais alta como no exemplo */
+                    rounded-[12px]
+                    p-10
+                    drop-shadow-[25px_25px_4.5px_rgba(90,86,90,0.2)]
+                "
+            >
 
-                <div>
-                    <h1 className="text-center text-[40px] font-bold">Login</h1>
-                </div>
+                <form onSubmit={handleLogin} className="flex flex-col items-center gap-8 w-full">
 
-                <div className="flex items-center justify-center flex-col min-w-[250px] gap-[30px]">
+                    {/* TÍTULO */}
+                    <h1 className="text-[36px] font-bold text-center">
+                        Login
+                    </h1>
 
-                    <div className="flex items-center justify-center flex-col gap-[4px] w-[350px]">
-                        <label htmlFor="input-emailLo" className="self-start pl-[5%] text-[20px]">Email</label>
-                        <input type="text" className="bg-transparent border-b-2 border-[#242424] pl-[2%] h-[35px] text-[18px] text-black w-full outline-none transition duration-300 focus:border-[#20c997]" value={emailLogin} required onChange={(event) => setEmailLogin(event.target.value)} />
+                    {/* CAMPOS */}
+                    <div className="flex flex-col w-full max-w-[360px] gap-6">
 
-                        <label htmlFor="input-senhaLo" className="self-start pl-[5%] text-[20px]">Senha</label>
-                        <input type="password" className="bg-transparent border-b-2 border-[#242424] pl-[2%] h-[35px] text-[18px] text-black w-full outline-none transition duration-300 focus:border-[#20c997]" value={senhaLogin} required onChange={(event) => setSenhaLogin(event.target.value)} minLength={8} />
+                        <div className="flex flex-col w-full gap-3">
+                            <label className="text-[20px]">Email</label>
+                            <input
+                                type="text"
+                                className="
+                                    bg-transparent border-b-2 border-[#242424]
+                                    h-[35px] text-[18px]
+                                    outline-none
+                                    focus:border-[#20c997]
+                                    transition
+                                "
+                                value={emailLogin}
+                                required
+                                onChange={(e) => setEmailLogin(e.target.value)}
+                            />
+
+                            <label className="text-[20px]">Senha</label>
+                            <input
+                                type="password"
+                                className="
+                                    bg-transparent border-b-2 border-[#242424]
+                                    h-[35px] text-[18px]
+                                    outline-none
+                                    focus:border-[#20c997]
+                                    transition
+                                "
+                                value={senhaLogin}
+                                required
+                                minLength={8}
+                                onChange={(e) => setSenhaLogin(e.target.value)}
+                            />
+                        </div>
+
+                        {/* LINK PARA CADASTRAR */}
+                        <p
+                            onClick={() => navigate('/Cadastro')}
+                            className="text-center cursor-pointer text-[16px]"
+                        >
+                            Não tem uma conta?
+                        </p>
+
                     </div>
 
-                    <div className="flex flex-col justify-center items-center cursor-pointer">
-                        <label onClick={() => navigate('/Cadastro')}>Não tem uma conta?</label>
-                    </div>
+                    {/* BOTÃO */}
+                    <button
+                        type="submit"
+                        className="
+                            rounded-[6px]
+                            bg-[#20c997]
+                            text-white font-bold
+                            text-[22px]
+                            h-[48px]
+                            w-[230px]
+                            transition
+                            hover:bg-[aliceblue]
+                            hover:text-black
+                            hover:border-[#20c997]
+                            border
+                        "
+                    >
+                        {isSaving ? 'Logando...' : 'Logar'}
+                    </button>
 
-                    <div className="flex flex-col justify-center items-center">
-
-                        <button type="submit" className="border border-transparent rounded-[3px] bg-[#20c997] text-white font-bold text-[25px] h-[45px] w-[220px] transition-all duration-400 cursor-pointer hover:bg-[aliceblue] hover:text-black hover:border-[#20c997]" >{isSaving ? 'Logando' : 'Logar'}</button>
-                    </div>
-
-
-                </div>
-
-
-            </form>
+                </form>
             </main>
+
         </div>
-
     )
-
-
 
 }
 

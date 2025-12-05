@@ -50,7 +50,13 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <RouterProvider router={router} />
-      <ToastContainer />
+      <ToastContainer
+        autoClose={4000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover={false} />
     </AuthProvider>
   </StrictMode>,
 )

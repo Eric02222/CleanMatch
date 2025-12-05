@@ -105,15 +105,31 @@ export function Home() {
     return (
         <div className="flex flex-col min-h-screen">
 
+            {/* AVISO */}
             {user && mostrarAviso && (
-                <div className="flex items-center justify-center mt-[90px] mx-auto mb-[-60px]">
+                <div className="
+            flex items-center justify-center mx-auto
+            md:mt-[90px] md:mb-[-60px]   /* DESKTOP */
+            mt-20 mb-[-55px] w-full      /* MOBILE */
+        ">
                     <Aviso />
                 </div>
             )}
 
-            <div className="flex flex-col items-center p-[80px] flex-grow">
+            {/* CONTAINER PRINCIPAL */}
+            <div className="flex flex-col items-center p-6 lg:p-[30px] flex-grow">
+
+                {/* WRAPPER CENTRAL — SEMPRE IGUAL EM QUALQUER TELA */}
                 <div className="flex flex-col justify-center w-full max-w-[1200px]">
-                    <div className="flex gap-[10px] mb-[20px] mx-auto w-full max-w-[1100px] bg-white p-[10px] rounded-[8px] shadow-[0_2px_5px_rgba(0,0,0,0.1)]">
+
+                    {/* INPUT DE BUSCA */}
+                    <div className="
+                        flex gap-[10px] mb-[20px] 
+                        mt-13 md:mt-0      /* Resolução MOBILE */
+                        md:mt-13 md:mb-4     /* Resolução TABLET */
+                        mx-auto w-full max-w-[1100px]
+                        bg-white p-[10px] rounded-[8px]
+                        shadow-[0_2px_5px_rgba(0,0,0,0.1)]">
                         <input
                             type="text"
                             placeholder="Buscar por nome, cidade ou estado"
@@ -123,102 +139,190 @@ export function Home() {
                         />
                     </div>
 
-                    <div className='qnt_itensPaginacao'>
-                        <label className='msgIdicativa'>Exibir por:</label>
+                    {/* EXIBIR POR */}
+                    <div className="flex items-center font-bold gap-[5px] pb-[10px] pl-[10px]">
+
+                        <label className="pb-[5px] text-[18px]">Exibir por:</label>
 
                         {[10, 15, 20, 25, 30].map(qnt => (
                             <button
                                 key={qnt}
-                                className={`bnt_qntItensPagina ${itensPorPagina === qnt ? 'active' : ''}`}
+                                className={`
+                        p-2 border rounded-[5px] font-medium transition duration-300
+                        ${itensPorPagina === qnt
+                                        ? "bg-[#1a9c78] text-white border-[#168d69]"
+                                        : "bg-transparent border-black hover:bg-[#1a9c78] hover:text-white hover:border-[#20c997] hover:scale-110"
+                                    }
+                    `}
                                 onClick={() => setItensPorPagina(qnt)}
                             >
                                 {qnt}
                             </button>
                         ))}
+
                     </div>
                 </div>
 
-                <div className="main-content">
+                {/* LISTA + PAINEL DE DETALHES */}
+                <div className="
+        flex flex-col lg:flex-row
+        gap-5
+        w-full max-w-[1200px]
+    ">
 
-                    <div className="card-list">
+                    {/* LISTA */}
+                    <div className="flex flex-col gap-[10px] flex-grow">
                         {usuariosDaPagina.map((user) => {
                             const fotoUsuario = user.foto_perfil || defaultAvatar;
-                            return (<Card
-                                key={user.id}
-                                data={user}
-                                onClick={() => handleCardClick(user)}
-                                isSelected={selectedCard === user}
-                                onClose={() => setSelectedCard(null)}
-                                fotoUrl={fotoUsuario}
-                            />)
+                            return (
+                                <Card
+                                    key={user.id}
+                                    data={user}
+                                    onClick={() => handleCardClick(user)}
+                                    isSelected={selectedCard === user}
+                                    onClose={() => setSelectedCard(null)}
+                                    fotoUrl={fotoUsuario}
+                                />
+                            );
                         })}
                     </div>
 
+                    {/* PAINEL DE DETALHES (RESPONSIVO) */}
                     {selectedCard && (() => {
                         const fotoUrl = selectedCard.foto_perfil || defaultAvatar;
 
                         return (
+                            <div className="
+                    bg-white shadow-[0_2px_5px_rgba(0,0,0,0.1)]
+                    rounded-[8px] p-5
+                    flex flex-col gap-3
+                    min-h-[300px]
 
+                    /* --- RESPONSIVO --- */
+                    w-full lg:w-[450px]
+                    lg:max-h-[390px]   /* <<< impede de descer até o rodapé */
+                    sticky lg:top-[80px]
+                    lg:overflow-auto">
+                                <button
+                                    className="absolute top-2 right-2 text-[#333] text-xl font-bold hover:scale-110 transition"
+                                    onClick={() => setSelectedCard(null)}
+                                >
+                                    X
+                                </button>
 
-                            <div className='detalhe_usuarios'>
-                                <div className="fechar-container" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+                                <div className="flex gap-[10px] mb-[15px]">
+                                    <img className="w-[150px] rounded-[5px] object-cover" src={fotoUrl} alt="Avatar" />
 
-                                    <div className="card-details">
-                                        <button
-                                            onClick={() => setSelectedCard(null)}
-                                            title="Fechar detalhes"
-                                        >
-                                            X
-                                        </button>
-                                    </div>
-
-                                    <div className='detalhes-topo'>
-                                        <img className="fotoUserdetalhes" src={fotoUrl} alt="Avatar do Perfil" />
-                                        <div className='infos-topo'>
-                                            <p className='nome-detalhes'><strong>{selectedCard.nome}</strong></p>
-                                            <p><strong>Email:</strong> {selectedCard.email}</p>
-                                            <p><strong>Contato:</strong> {formatPhoneNumber(selectedCard.contato)}</p>
-
-                                        </div>
-                                    </div>
-
-                                    <div className='detalhes-bottom'>
-
-                                        <p><strong>CEP:</strong> {formatCepNumber(selectedCard.cep)}</p>
-                                        <p><strong>Localização:</strong> {selectedCard.cidade}, {selectedCard.estado}</p>
-                                        <p><strong>Rua:</strong> {selectedCard.rua}</p>
-                                        <p><strong>Horário:</strong>{formatTime(selectedCard.cargaHoraria_inicio)} - {formatTime(selectedCard.cargaHoraria_fim)}</p>
-                                        <p><strong>Faixa de Preço:</strong> R$ {selectedCard.valor_min} - R$ {selectedCard.valor_max}</p>
-                                        <p><strong>Descrição:</strong> {selectedCard.descricao}</p>
+                                    <div>
+                                        <p className="text-[30px] lg:text-[40px] text-black">
+                                            <strong className="text-[#333]">{selectedCard.nome}</strong>
+                                        </p>
+                                        <p><strong>Email:</strong> {selectedCard.email}</p>
+                                        <p><strong>Contato:</strong> {formatPhoneNumber(selectedCard.contato)}</p>
                                     </div>
                                 </div>
 
-
+                                <div className="border-t border-gray-400 pt-3">
+                                    <p><strong>CEP:</strong> {formatCepNumber(selectedCard.cep)}</p>
+                                    <p><strong>Localização:</strong> {selectedCard.cidade}, {selectedCard.estado}</p>
+                                    <p><strong>Rua:</strong> {selectedCard.rua}</p>
+                                    <p><strong>Horário:</strong> {formatTime(selectedCard.cargaHoraria_inicio)} - {formatTime(selectedCard.cargaHoraria_fim)}</p>
+                                    <p><strong>Faixa de Preço:</strong> R$ {selectedCard.valor_min} - R$ {selectedCard.valor_max}</p>
+                                    <p><strong>Descrição:</strong> {selectedCard.descricao}</p>
+                                </div>
                             </div>
-
-                        )
+                        );
                     })()}
-
                 </div>
 
-                <div className='conteudo_bottom'>
-                    <div className="controle_paginacao">
+                {/* MODAL MOBILE */}
+                {selectedCard && (
+                    <div className="fixed inset-0 z-5 flex items-center justify-center lg:hidden overflow-y-auto
+    break-words">
+
+                        {/* OVERLAY */}
+                        <div
+                            className="absolute inset-0 bg-black/50"
+                            onClick={() => setSelectedCard(null)}
+                        />
+
+                        {/* MODAL */}
+                        <div
+                            className=" 
+                relative bg-white rounded-2xl p-6 w-[90%] max-w-[380px]
+                animate-[fadeIn_0.25s_ease]
+            "
+                        >
+                            {/* BOTÃO FECHAR */}
+                            <button
+                                onClick={() => setSelectedCard(null)}
+                                className="absolute top-3 right-4 text-3xl font-bold leading-[0.8]"
+                            >
+                                ×
+                            </button>
+
+                            {/* CONTEÚDO */}
+                            <div className="flex flex-col gap-4">
+
+                                <img
+                                    src={selectedCard.foto_perfil || defaultAvatar}
+                                    className="w-full h-[200px] object-cover rounded-lg"
+                                />
+
+                                <h2 className="text-2xl font-bold">{selectedCard.nome}</h2>
+
+                                <p><strong>Email:</strong> {selectedCard.email}</p>
+                                <p><strong>Contato:</strong> {formatPhoneNumber(selectedCard.contato)}</p>
+                                <p><strong>CEP:</strong> {formatCepNumber(selectedCard.cep)}</p>
+                                <p><strong>Endereço:</strong> {selectedCard.rua}, {selectedCard.cidade} - {selectedCard.estado}</p>
+                                <p><strong>Horário:</strong> {formatTime(selectedCard.cargaHoraria_inicio)}h - {formatTime(selectedCard.cargaHoraria_fim)}h</p>
+                                <p><strong>Preço:</strong> R$ {selectedCard.valor_min} - R$ {selectedCard.valor_max}</p>
+                                <p><strong>Descrição:</strong> {selectedCard.descricao}</p>
+
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ANIMAÇÃO TAILWIND */}
+                <style>
+                    {
+                        `@keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(20px); }
+                        to { opacity: 1; transform: translateY(0); }}`
+                    }
+                </style>
+
+
+                {/* PAGINAÇÃO */}
+                <div className="pt-[15px] flex justify-center">
+                    <div className="flex flex-row gap-[5px] flex-wrap">
                         <button
+                            className="px-[10px] py-[10px] bg-transparent border border-black rounded-[5px] transition duration-300 hover:bg-[#1a9c78] hover:text-white hover:border-[#20c997] hover:scale-110"
                             onClick={() => setPaginaAtual(paginaAtual - 1)}
                             disabled={paginaAtual === 1}
                         >
                             Anterior
                         </button>
+
                         {Array.from({ length: totalDePaginas }, (_, index) => (
                             <button
                                 key={index + 1}
                                 onClick={() => setPaginaAtual(index + 1)}
-                                className={paginaAtual === index + 1 ? 'active' : ''}
+                                className={`
+                        px-[10px] py-[10px] rounded-[5px] border transition duration-300
+                        ${paginaAtual === index + 1
+                                        ? "bg-[#1a9c78] text-white border-[#168d69]"
+                                        : "bg-transparent border-black hover:bg-[#1a9c78] hover:text-white hover:border-[#20c997] hover:scale-110"
+                                    }
+                    `}
                             >
                                 {index + 1}
                             </button>
                         ))}
+
                         <button
+                            className="px-[10px] py-[10px] bg-transparent border border-black rounded-[5px] transition duration-300 hover:bg-[#1a9c78] hover:text-white hover:border-[#20c997] hover:scale-110"
                             onClick={() => setPaginaAtual(paginaAtual + 1)}
                             disabled={paginaAtual === totalDePaginas}
                         >
@@ -228,8 +332,6 @@ export function Home() {
                 </div>
 
             </div>
-
-
 
         </div>
     );
