@@ -252,7 +252,7 @@ function Perfil() {
       pt-6 md:pt-[2vh] 
       px-6 md:pl-[7vw] 
       shadow-[0_2px_5px_rgba(0,0,0,0.1)]
-      h-auto md:h-[55vh]
+      h-auto md:h-[65vh]
   ">
 
         {/* FOTO */}
@@ -461,7 +461,7 @@ function Perfil() {
 
             <div className="flex flex-col sm:flex-row items-start justify-end gap-2 pr-2">
               <label className="label" id='descricao'>Descrição:</label>
-              <textarea id="descricao" name='descricao' maxlength="500" className="input-base min-h-[80px]" value={accountData?.descricao || ''} onChange={handleInputChange} readOnly={!isEditing} />
+              <textarea id="descricao" name='descricao' maxLength="500" className="input-base min-h-[80px]" value={accountData?.descricao || ''} onChange={handleInputChange} readOnly={!isEditing} />
             </div>
           </>
         )}
@@ -476,7 +476,7 @@ function Perfil() {
             </>
           ) : (
             <>
-              <button onClick={handleSaveClick} className="btn-primary w-[150px]">Salvar Edição</button>
+              <button onClick={handleSaveClick} className="btn-primary w-[150px] ">Salvar Edição</button>
               <button onClick={handleCancelEdit} className="btn-danger w-[180px]">Cancelar Edição</button>
             </>
           )}

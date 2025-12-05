@@ -95,6 +95,10 @@ export function Home() {
         setSelectedCard(user);
     };
 
+    const handleImageError = (e) => {
+        e.target.onerror = null;
+        e.target.src = defaultAvatar;
+    };
 
     const totalDePaginas = Math.ceil(usuariosVisiveis.length / itensPorPagina);
     const ultimoItemIndex = paginaAtual * itensPorPagina;
@@ -117,19 +121,21 @@ export function Home() {
             )}
 
             {/* CONTAINER PRINCIPAL */}
-            <div className="flex flex-col items-center p-6 lg:p-[30px] flex-grow">
+            <div className="flex flex-col items-center p-4 lg:p-[30px] flex-grow w-full overflow-hidden">
 
                 {/* WRAPPER CENTRAL — SEMPRE IGUAL EM QUALQUER TELA */}
                 <div className="flex flex-col justify-center w-full max-w-[1200px]">
 
                     {/* INPUT DE BUSCA */}
                     <div className="
-                        flex gap-[10px] mb-[20px] 
-                        mt-13 md:mt-0      /* Resolução MOBILE */
-                        md:mt-13 md:mb-4     /* Resolução TABLET */
-                        mx-auto w-full max-w-[1100px]
-                        bg-white p-[10px] rounded-[8px]
-                        shadow-[0_2px_5px_rgba(0,0,0,0.1)]">
+        flex gap-[10px] mb-[20px] 
+        mt-13  
+        md:mt-13 md:mb-4 
+        mx-auto w-full max-w-full lg:max-w-[1100px] {/* Adicionado max-w-full */}
+        bg-white p-[10px] rounded-[8px]
+        shadow-[0_2px_5px_rgba(0,0,0,0.1)]
+        box-border {/* Garante que o padding não aumente a largura total */}
+    ">
                         <input
                             type="text"
                             placeholder="Buscar por nome, cidade ou estado"
@@ -140,7 +146,7 @@ export function Home() {
                     </div>
 
                     {/* EXIBIR POR */}
-                    <div className="flex items-center font-bold gap-[5px] pb-[10px] pl-[10px]">
+                    <div className="flex items-center flex-wrap font-bold gap-[5px] pb-[10px] pl-[10px]">
 
                         <label className="pb-[5px] text-[18px]">Exibir por:</label>
 
@@ -171,15 +177,16 @@ export function Home() {
     ">
 
                     {/* LISTA */}
-                    <div className="flex flex-col gap-[10px] flex-grow">
+                    <div className="flex flex-col gap-[10px] flex-grow w-full overflow-hidden">
                         {usuariosDaPagina.map((user) => {
-                            const fotoUsuario = user.foto_perfil || defaultAvatar;
+                            const fotoUsuario = user.foto_perfil;
                             return (
                                 <Card
                                     key={user.id}
                                     data={user}
                                     onClick={() => handleCardClick(user)}
                                     isSelected={selectedCard === user}
+                                    onError={handleImageError}
                                     onClose={() => setSelectedCard(null)}
                                     fotoUrl={fotoUsuario}
                                 />
@@ -193,25 +200,26 @@ export function Home() {
 
                         return (
                             <div className="
+                            hidden lg:flex
                     bg-white shadow-[0_2px_5px_rgba(0,0,0,0.1)]
                     rounded-[8px] p-5
-                    flex flex-col gap-3
+                    flex-col gap-3
                     min-h-[300px]
 
                     /* --- RESPONSIVO --- */
-                    w-full lg:w-[450px]
-                    lg:max-h-[390px]   /* <<< impede de descer até o rodapé */
+                    w-full lg:w-[600px]
+                    lg:max-h-[500px]   /* <<< impede de descer até o rodapé */
                     sticky lg:top-[80px]
-                    lg:overflow-auto">
+                    ">
                                 <button
-                                    className="absolute top-2 right-2 text-[#333] text-xl font-bold hover:scale-110 transition"
+                                    className="absolute top-2 right-2 text-[#333] text-xl font-bold hover:scale-110 hover:text-[#ef0707] transition"
                                     onClick={() => setSelectedCard(null)}
                                 >
                                     X
                                 </button>
 
                                 <div className="flex gap-[10px] mb-[15px]">
-                                    <img className="w-[150px] rounded-[5px] object-cover" src={fotoUrl} alt="Avatar" />
+                                    <img className="w-[150px] h-[150px] rounded-[5px] object-cover bg-[#434343]" onError={handleImageError} src={fotoUrl} alt="Avatar" />
 
                                     <div>
                                         <p className="text-[30px] lg:text-[40px] text-black">
@@ -256,7 +264,10 @@ export function Home() {
                             {/* BOTÃO FECHAR */}
                             <button
                                 onClick={() => setSelectedCard(null)}
-                                className="absolute top-3 right-4 text-3xl font-bold leading-[0.8]"
+                                className="absolute top-3 right-3 z-10
+        w-9 h-9 flex items-center justify-center
+        bg-white rounded-full shadow-md
+        hover:scale-110 text-red-500 font-bold text-xl transition-all"
                             >
                                 ×
                             </button>
@@ -266,7 +277,8 @@ export function Home() {
 
                                 <img
                                     src={selectedCard.foto_perfil || defaultAvatar}
-                                    className="w-full h-[200px] object-cover rounded-lg"
+                                    onError={handleImageError}
+                                    className="w-full h-[200px] object-cover rounded-lg bg-[#434343]"
                                 />
 
                                 <h2 className="text-2xl font-bold">{selectedCard.nome}</h2>

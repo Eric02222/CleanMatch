@@ -12,15 +12,13 @@
     }
   
     .btn-primary {
-      @apply border-none rounded-[6px] bg-[#1EA896] text-white font-bold text-[18px] 
-             h-[40px] px-4 shadow-md hover:bg-white hover:text-black hover:border hover:border-[#1EA896]
-             transition duration-300;
+      @apply border-none rounded-[6px] bg-[#1EA896] text-white font-bold shadow-md hover:bg-white hover:text-black hover:border hover:border-[#1EA896]
+             transition duration-300 text-[14px] h-[45px] px-3 md:text-[18px] md:h-[40px] md:px-4;
     }
   
     .btn-danger {
-      @apply border-none rounded-[6px] bg-[#b41919] text-white font-bold text-[18px]
-             h-[40px] px-4 shadow-md hover:bg-white hover:text-[#b41919] hover:border hover:border-[#b41919]
-             transition duration-300;
+      @apply border-none rounded-[6px] bg-[#b41919] text-white font-bold shadow-md hover:bg-white hover:text-[#b41919] hover:border hover:border-[#b41919]
+             transition duration-300 text-[14px] h-[45px] px-3 md:text-[18px] md:h-[40px] md:px-4;
     }
   
     .modal-overlay {
