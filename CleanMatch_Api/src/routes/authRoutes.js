@@ -5,11 +5,6 @@ import { authController } from "../controller/authController/AuthController.js";
 
 export const authRouter = Router()
 
-authRouter.post("/register", authController.register)
-authRouter.post("/login", authController.login)
-authRouter.post('/logout', auth, authController.logout);
-authRouter.post('/refresh', auth, authController.refresh);
-
 authRouter.post(
   "/register",
   /* 
@@ -33,8 +28,8 @@ authRouter.post(
 );
 
 authRouter.post(
-  "/auth/logout",
-  auth,
+  "/logout",
+  // auth,
   /* 
     #swagger.tags = ['Autenticação']
     #swagger.description = 'Rotas públicas e protegidas de autenticação JWT'
@@ -45,8 +40,8 @@ authRouter.post(
 );
 
 authRouter.post(
-  "/auth/refresh",
-  auth,
+  "/refresh",
+  // auth,
   /* 
     #swagger.tags = ['Autenticação']
     #swagger.description = 'Rotas públicas e protegidas de autenticação JWT'

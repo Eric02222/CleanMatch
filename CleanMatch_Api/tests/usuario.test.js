@@ -27,10 +27,10 @@ describe('Integração: UsuarioController e Rotas API', () => {
         // Criação do usuário comum
         usuarioPadrao = await prismaClient.usuario.create({
             data: {
-                nome: "Usuário Padrão",
-                email: "padrao@email.com",
+                nome: "juazinho",
+                email: "juazinho@email.com",
                 senha: "123",
-                tipo_conta: "cliente",
+                tipo_conta: "Cliente",
                 ...camposPadroes // Espalha os campos obrigatórios vazios
             }
         });
@@ -59,7 +59,7 @@ describe('Integração: UsuarioController e Rotas API', () => {
             nome: "Novo Teste",
             email: "novo@email.com",
             senha: "abc",
-            tipo_conta: "cliente",
+            tipo_conta: "Cliente",
             ...camposPadroes
         };
 
@@ -90,7 +90,7 @@ describe('Integração: UsuarioController e Rotas API', () => {
                 nome: "Tentativa Duplicada",
                 email: usuarioPadrao.email,
                 senha: "456",
-                tipo_conta: "cliente",
+                tipo_conta: "Cliente",
                 ...camposPadroes
             });
 
@@ -150,7 +150,7 @@ describe('Integração: UsuarioController e Rotas API', () => {
         expect(response.body.email).toBe(usuarioPadrao.email);
 
         // Expect 3: Verifica se o tipo de conta está correto
-        expect(response.body.tipo_conta).toBe("cliente");
+        expect(response.body.tipo_conta).toBe("Cliente");
     });
 
     // -----------------------------------------------------------------
@@ -195,7 +195,7 @@ describe('Integração: UsuarioController e Rotas API', () => {
 
         // Expect 3: O usuário padrão não deve ter sido alterado
         const usuario = await prismaClient.usuario.findUnique({ where: { id: usuarioPadrao.id } });
-        expect(usuario.nome).toBe("Usuário Padrão");
+        expect(usuario.nome).toBe("juazinho");
     });
 
     // -----------------------------------------------------------------

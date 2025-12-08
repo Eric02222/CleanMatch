@@ -1,7 +1,7 @@
 import request from 'supertest';
-import app from '../src/app.js';
-import { prismaClient } from '../prisma/prisma.js'; 
-import { auth } from '../src/middleware/auth.js'; 
+import { app } from '../src/app.js';
+import { prismaClient } from '../prisma/prisma.js';
+import { auth } from '../src/middleware/auth.js';
 
 // Variáveis globais para armazenar dados gerados nos testes
 let usuarioPadrao;
@@ -11,8 +11,8 @@ const SENHA_PADRAO = 'senha123Teste'; // Senha a ser usada e hasheada
 
 // Campos obrigatórios do Model Usuario
 const camposPadroes = {
-    contato: "", cep: "", estado: "", cidade: "", rua: "", 
-    valor_min: "", valor_max: "", cargaHoraria_inicio: "", 
+    contato: "", cep: "", estado: "", cidade: "", rua: "",
+    valor_min: "", valor_max: "", cargaHoraria_inicio: "",
     cargaHoraria_fim: "", descricao: ""
 };
 
@@ -21,28 +21,30 @@ describe('Integração: AuthController (Rotas Reais)', () => {
 
     // Limpa ambas as tabelas (Usuário e Token)
     beforeEach(async () => {
-        await prismaClient.token.deleteMany();
-        await prismaClient.usuario.deleteMany();
+        await prismaClient.$transaction([
+            prismaClient.token.deleteMany(),
+            prismaClient.usuario.deleteMany(),
+        ]);
 
         // 1. Cria um usuário de teste (sem hash, pois o login que fará a verificação)
         // OBS: Usamos o método POST /register para criar o usuário via rota
         const registerResponse = await request(app)
-            .post('/register')
+            .post('/auth/register')
             .send({
                 nome: "Usuario Padrão Teste",
                 email: "padrao@teste.com",
                 senha: SENHA_PADRAO,
-                tipo_conta: "admin",
+                tipo_conta: "Cliente",
                 ...camposPadroes
             });
 
         // Garantir que o setup foi bem sucedido
         expect(registerResponse.status).toBe(201);
         usuarioPadrao = registerResponse.body;
-        
+
         // 2. Realiza o login para obter tokens para os testes protegidos
         const loginResponse = await request(app)
-            .post('/login')
+            .post('/auth/login')
             .send({
                 email: "padrao@teste.com",
                 senha: SENHA_PADRAO
@@ -64,12 +66,12 @@ describe('Integração: AuthController (Rotas Reais)', () => {
     test('Não deve registrar usuário com email existente (POST /register)', async () => {
         // Tenta registrar com o email do usuarioPadrao que o beforeEach já criou
         const response = await request(app)
-            .post('/register')
+            .post('/auth/register')
             .send({
                 nome: "Duplicado",
-                email: usuarioPadrao.email,
+                email: "padrao@teste.com",
                 senha: SENHA_PADRAO,
-                tipo_conta: "client"
+                tipo_conta: "Cliente"
             });
 
         // Expect 1: Status de Conflito
@@ -89,10 +91,10 @@ describe('Integração: AuthController (Rotas Reais)', () => {
     test('Não deve logar com senha inválida (POST /login)', async () => {
         // Tenta logar usando o usuário criado, mas com a senha errada
         const response = await request(app)
-            .post('/login')
+            .post('/auth/login')
             .send({
                 email: usuarioPadrao.email,
-                senha: 'senhaErrada' 
+                senha: 'senhaErrada'
             });
 
         // Expect 1: Status de Não Autorizado
