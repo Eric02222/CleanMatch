@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url = "mysql://root:861391@localhost:3306/cleanMatch"
+  provider = "postgresql"
+  url = "postgresql://postgres:861391@localhost:5432/cleanMatch"
 }
 
 //referencia
@@ -24,7 +24,7 @@ model Usuario {
   cargaHoraria_inicio String
   cargaHoraria_fim    String
   descricao           String    @db.VarChar(500)
-  foto_perfil         String?   @db.LongText
+  foto_perfil         String?   @db.Text
   tokens              token[]
 
   @@map("usuario")
