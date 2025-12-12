@@ -4,6 +4,16 @@ class UsuarioController {
 
     constructor() { }
     async getTodosOsUsuarios(req, res) {
+        // const { page, limit } = req.query
+        // const pageNumber = page ? Number(page) : 1
+        // const limitNumber = limit ? Number(limit) : 10
+        // const skip = (pageNumber - 1) * limitNumber
+
+        // {
+        //         skip: skip,
+        //         take: limitNumber,
+                
+        //     }
         try {
             const usuarios = await prismaClient.usuario.findMany();
             return res.json(usuarios)
@@ -52,17 +62,17 @@ class UsuarioController {
                     email: body.email,
                     senha: body.senha,
                     tipo_conta: body.tipo_conta,
-                    contato: "", 
-                    cep: "", 
-                    estado: "", 
-                    cidade: "", 
-                    rua: "", 
-                    valor_min: "", 
-                    valor_max: "", 
-                    cargaHoraria_inicio: '', 
-                    cargaHoraria_fim: '', 
-                    descricao: "", 
-                    foto_perfil: 'teste' 
+                    contato: "",
+                    cep: "",
+                    estado: "",
+                    cidade: "",
+                    rua: "",
+                    valor_min: "",
+                    valor_max: "",
+                    cargaHoraria_inicio: '',
+                    cargaHoraria_fim: '',
+                    descricao: "",
+                    foto_perfil: 'teste'
                 },
             })
             return res.status(201).json(usuario)
@@ -75,77 +85,77 @@ class UsuarioController {
     }
 
     async atualizarUsuario(req, res) {
-    try {
-        const { body, params } = req;
-        const { token, id, ...dadosParaSalvar } = body;
+        try {
+            const { body, params } = req;
+            const { token, id, ...dadosParaSalvar } = body;
 
-        if (Object.keys(dadosParaSalvar).length === 0) {
-             return res.status(400).send("Nenhum dado válido para atualizar.");
-        }
+            if (Object.keys(dadosParaSalvar).length === 0) {
+                return res.status(400).send("Nenhum dado válido para atualizar.");
+            }
 
-        const usuarioAtualizado = await prismaClient.usuario.update({
-            where: { id: Number(params.id) },
-            data: dadosParaSalvar 
-        });
+            const usuarioAtualizado = await prismaClient.usuario.update({
+                where: { id: Number(params.id) },
+                data: dadosParaSalvar
+            });
 
-        delete usuarioAtualizado.senha; 
+            delete usuarioAtualizado.senha;
 
-        return res.status(200).json({
-            message: "Usuário atualizado!",
-            data: usuarioAtualizado
-        });
+            return res.status(200).json({
+                message: "Usuário atualizado!",
+                data: usuarioAtualizado
+            });
 
-    } catch (error) {
-        console.error("Erro no Update:", error); 
+        } catch (error) {
+            console.error("Erro no Update:", error);
 
-        if (error.code === "P2025") {
-            return res.status(404).send("Usuário não encontrado.");
-        }
-        if (error.code === "P2002") {
-            return res.status(409).send("Email já cadastrado.");
-        }
-        return res.status(500).json({ 
-            message: "Erro interno ao atualizar.",
-            erroDetalhado: error.message 
-        });
-    }
-}
-
-   async deletarUsuario(req, res) {
-    const { params } = req;
-    console.log("Tentando deletar usuário ID:", params.id); 
-
-    try {
-        const usuarioDeletado = await prismaClient.usuario.delete({
-            where: {
-                id: Number(params.id),
-            },
-        });
-
-        return res.status(200).json({
-            message: "Usuário deletado com sucesso!",
-            data: usuarioDeletado
-        });
-
-    } catch (error) {
-        console.error("Erro ao deletar usuário:", error); 
-
-        if (error.code === "P2025") {
-            return res.status(404).json({ message: "Usuário não encontrado no banco." });
-        }
-
-        if (error.code === "P2003") {
-            return res.status(400).json({ 
-                message: "Não é possível excluir a conta pois existem dados vinculados (Tokens, Serviços, etc).",
-                erro: "Violação de integridade referencial (Foreign Key)"
+            if (error.code === "P2025") {
+                return res.status(404).send("Usuário não encontrado.");
+            }
+            if (error.code === "P2002") {
+                return res.status(409).send("Email já cadastrado.");
+            }
+            return res.status(500).json({
+                message: "Erro interno ao atualizar.",
+                erroDetalhado: error.message
             });
         }
-
-        return res.status(500).json({ 
-            message: "Erro interno ao tentar excluir conta.",
-            detalhes: error.message 
-        });
     }
-}
+
+    async deletarUsuario(req, res) {
+        const { params } = req;
+        console.log("Tentando deletar usuário ID:", params.id);
+
+        try {
+            const usuarioDeletado = await prismaClient.usuario.delete({
+                where: {
+                    id: Number(params.id),
+                },
+            });
+
+            return res.status(200).json({
+                message: "Usuário deletado com sucesso!",
+                data: usuarioDeletado
+            });
+
+        } catch (error) {
+            console.error("Erro ao deletar usuário:", error);
+
+            if (error.code === "P2025") {
+                return res.status(404).json({ message: "Usuário não encontrado no banco." });
+            }
+
+            if (error.code === "P2003") {
+                return res.status(400).json({
+                    message: "Não é possível excluir a conta pois existem dados vinculados (Tokens, Serviços, etc).",
+                    erro: "Violação de integridade referencial (Foreign Key)"
+                });
+            }
+
+            return res.status(500).json({
+                message: "Erro interno ao tentar excluir conta.",
+                detalhes: error.message
+            });
+        }
+    }
 }
 export const usuarioController = new UsuarioController();
