@@ -159,7 +159,6 @@
                     storedRefreshToken.expiresAt < new Date()
                 )
                     return res.status(401).json({ error: "invalid refresh token" });
-
                 await prismaClient.token.updateMany({
                     where: { id: storedRefreshToken?.id ?? 0 },
                     data: { revoked: true },

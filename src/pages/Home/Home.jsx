@@ -179,7 +179,7 @@ export function Home() {
                     {/* LISTA */}
                     <div className="flex flex-col gap-[10px] flex-grow w-full overflow-hidden">
                         {usuariosDaPagina.map((user) => {
-                            const fotoUsuario = user.foto_perfil;
+                            const fotoUsuario = user.foto_perfil || defaultAvatar;
                             return (
                                 <Card
                                     key={user.id}
@@ -201,6 +201,7 @@ export function Home() {
                         return (
                             <div className="
                             hidden lg:flex
+                            
                     bg-white shadow-[0_2px_5px_rgba(0,0,0,0.1)]
                     rounded-[8px] p-5
                     flex-col gap-3
@@ -209,7 +210,7 @@ export function Home() {
                     /* --- RESPONSIVO --- */
                     w-full lg:w-[600px]
                     lg:max-h-[500px]   /* <<< impede de descer até o rodapé */
-                    sticky lg:top-[80px]
+                    lg:sticky lg:top-[80px]
                     ">
                                 <button
                                     className="absolute top-2 right-2 text-[#333] text-xl font-bold hover:scale-110 hover:text-[#ef0707] transition"
