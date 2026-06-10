@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify';
-
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import api from '../../services/api';
+import { HiMail, HiLockClosed, HiArrowRight } from "react-icons/hi";
 
 export function Login() {
     const { login, user } = useAuth()
@@ -24,167 +24,114 @@ export function Login() {
         SetIsSaving(true)
 
         try {
-            const data = {
+            const loginData = {
                 email: emailLogin,
                 senha: senhaLogin
             }
 
-            const res = await axios.post('http://localhost:4000/auth/login', data)
-            const token = res.data.accessToken
-            console.log(res)
-
-            if (res.data.length === 0) {
-                SetIsSaving(false)
-                return toast.error('Usuario não encontrado', {
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    pauseOnHover: false
-                })
-            }
-
-            const userRes = await axios.get('http://localhost:4000/usuarios/byemail', {
-                params: {
-                    email: data.email
-                },
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-            })
-
-            const userDataArray = userRes.data;
-            const userData = Array.isArray(userDataArray) ? userDataArray[0] : userDataArray;
-
-            if (!userData) {
-                SetIsSaving(false)
-                return toast.error('Dados do usuário não encontrados após login', { /* ... */ })
-            }
+            const res = await api.post('/auth/login', loginData)
+            const { accessToken, usuario } = res.data
 
             const fullUserData = {
-                ...userData, // Espalha todos os dados do usuário (id, nome, email, etc.)
-                token,       // Adiciona o token no objeto
+                ...usuario,
+                token: accessToken,
             };
 
-            SetIsSaving(false)
             login(fullUserData)
-            toast.success('Login realizado com sucesso!', {
+            toast.success('Bem-vindo de volta!', {
                 autoClose: 3000,
                 hideProgressBar: true,
                 pauseOnHover: false
             })
             navigate('/')
-            // setTimeout(() => , 2000)
 
         }
         catch (error) {
-            SetIsSaving(false)
-            console.log('Erro ao de conexão:', error);
-            toast.error('Erro ao conectar ao servidor', {
+            console.error('Erro no login:', error);
+            const message = error.response?.data?.error || 'Erro ao conectar ao servidor';
+            toast.error(message, {
                 autoClose: 3000,
                 hideProgressBar: true,
                 pauseOnHover: false
             })
+        } finally {
+            SetIsSaving(false)
         }
-
-
     }
 
-
-
     return (
-        <div className="flex items-center justify-center flex-col min-h-screen text-black bg-[#20c997] p-4">
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-brand-primary/5 rounded-full blur-3xl" />
+                <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-brand-primary/10 rounded-full blur-3xl" />
+            </div>
 
-            {/* CAIXA BRANCA ALTA / RESPONSIVA */}
-            <main
-                className="
-                    flex flex-col
-                    bg-white
-                    w-full
-                    max-w-[400px]            /* largura proporcional */
-                    min-h-[50vh]             /* altura mais alta como no exemplo */
-                    rounded-[12px]
-                    p-10
-                    drop-shadow-[25px_25px_4.5px_rgba(90,86,90,0.2)]
-                "
-            >
-
-                <form onSubmit={handleLogin} className="flex flex-col items-center gap-8 w-full">
-
-                    {/* TÍTULO */}
-                    <h1 className="text-[36px] font-bold text-center">
-                        Login
-                    </h1>
-
-                    {/* CAMPOS */}
-                    <div className="flex flex-col w-full max-w-[360px] gap-6">
-
-                        <div className="flex flex-col w-full gap-3">
-                            <label className="text-[20px]">Email</label>
-                            <input
-                                type="text"
-                                className="
-                                    bg-transparent border-b-2 border-[#242424]
-                                    h-[35px] text-[18px]
-                                    outline-none
-                                    focus:border-[#20c997]
-                                    transition
-                                "
-                                value={emailLogin}
-                                required
-                                onChange={(e) => setEmailLogin(e.target.value)}
-                            />
-
-                            <label className="text-[20px]">Senha</label>
-                            <input
-                                type="password"
-                                className="
-                                    bg-transparent border-b-2 border-[#242424]
-                                    h-[35px] text-[18px]
-                                    outline-none
-                                    focus:border-[#20c997]
-                                    transition
-                                "
-                                value={senhaLogin}
-                                required
-                                minLength={8}
-                                onChange={(e) => setSenhaLogin(e.target.value)}
-                            />
+            <main className="relative w-full max-w-[480px] animate-in fade-in zoom-in duration-500">
+                <div className="bg-white rounded-[40px] shadow-2xl shadow-slate-200/60 border border-slate-100 p-8 md:p-12">
+                    <div className="text-center space-y-2 mb-10">
+                        <div className="inline-flex p-4 bg-brand-primary/10 rounded-2xl mb-4 text-brand-primary">
+                            <HiLockClosed className="text-3xl" />
                         </div>
-
-                        {/* LINK PARA CADASTRAR */}
-                        <p
-                            onClick={() => navigate('/Cadastro')}
-                            className="text-center cursor-pointer text-[16px]"
-                        >
-                            Não tem uma conta?
-                        </p>
-
+                        <h1 className="text-4xl font-black text-slate-900 tracking-tight">Login</h1>
+                        <p className="text-slate-500 font-medium">Que bom ver você por aqui novamente!</p>
                     </div>
 
-                    {/* BOTÃO */}
-                    <button
-                        type="submit"
-                        className="
-                            rounded-[6px]
-                            bg-[#20c997]
-                            text-white font-bold
-                            text-[22px]
-                            h-[48px]
-                            w-[230px]
-                            transition
-                            hover:bg-[aliceblue]
-                            hover:text-black
-                            hover:border-[#20c997]
-                            border
-                        "
-                    >
-                        {isSaving ? 'Logando...' : 'Logar'}
-                    </button>
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        <div className="space-y-4">
+                            <div className="space-y-1.5">
+                                <label className="label">E-mail</label>
+                                <div className="relative group">
+                                    <HiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl group-focus-within:text-brand-primary transition-colors" />
+                                    <input
+                                        type="email"
+                                        placeholder="seu@email.com"
+                                        className="input-base pl-12"
+                                        value={emailLogin}
+                                        required
+                                        onChange={(e) => setEmailLogin(e.target.value)}
+                                    />
+                                </div>
+                            </div>
 
-                </form>
+                            <div className="space-y-1.5">
+                                <label className="label">Senha</label>
+                                <div className="relative group">
+                                    <HiLockClosed className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl group-focus-within:text-brand-primary transition-colors" />
+                                    <input
+                                        type="password"
+                                        placeholder="••••••••"
+                                        className="input-base pl-12"
+                                        value={senhaLogin}
+                                        required
+                                        minLength={8}
+                                        onChange={(e) => setSenhaLogin(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm">
+                            <Link to="/Cadastro" className="text-slate-500 font-bold hover:text-brand-primary transition-colors">
+                                Criar nova conta
+                            </Link>
+                            <Link to="/forgot-password" size="sm" className="text-brand-primary font-bold hover:underline">Esqueceu a senha?</Link>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={isSaving}
+                            className="btn-primary w-full !h-12 !px-6 !rounded-xl !text-base shadow-brand-primary/20 flex items-center justify-center gap-3"
+                        >
+                            <span className="font-black">{isSaving ? 'Verificando...' : 'Entrar na Conta'}</span>
+                            {!isSaving && <HiArrowRight className="text-2xl group-hover:translate-x-1 transition-transform" />}
+                        </button>
+                    </form>
+                </div>
+
+                <p className="text-center mt-8 text-slate-400 text-sm font-medium">
+                    CleanMatch &bull; Sua plataforma de serviços profissionais
+                </p>
             </main>
-
         </div>
     )
-
 }
-

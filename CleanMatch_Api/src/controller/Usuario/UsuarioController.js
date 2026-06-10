@@ -3,39 +3,64 @@ import { prismaClient } from '../../../prisma/prisma.js';
 class UsuarioController {
 
     constructor() { }
-    async getTodosOsUsuarios(req, res) {
-        // const { page, limit } = req.query
-        // const pageNumber = page ? Number(page) : 1
-        // const limitNumber = limit ? Number(limit) : 10
-        // const skip = (pageNumber - 1) * limitNumber
-
-        // {
-        //         skip: skip,
-        //         take: limitNumber,
-                
-        //     }
+    async getTodosOsUsuarios(req, res, next) {
         try {
-            const usuarios = await prismaClient.usuario.findMany();
+            const usuarios = await prismaClient.usuario.findMany({
+                select: {
+                    id: true,
+                    nome: true,
+                    email: true,
+                    tipo_conta: true,
+                    contato: true,
+                    cep: true,
+                    estado: true,
+                    cidade: true,
+                    rua: true,
+                    valor_min: true,
+                    valor_max: true,
+                    cargaHoraria_inicio: true,
+                    cargaHoraria_fim: true,
+                    descricao: true,
+                    foto_perfil: true,
+                }
+            });
             return res.json(usuarios)
         }
-        catch (e) {
-            console.log(e)
+        catch (error) {
+            next(error);
         }
     }
 
-    async getUsuarioPorId(req, res) {
+    async getUsuarioPorId(req, res, next) {
         try {
             const { params } = req
             const usuario = await prismaClient.usuario.findUnique({
                 where: {
                     id: Number(params.id)
+                },
+                select: {
+                    id: true,
+                    nome: true,
+                    email: true,
+                    tipo_conta: true,
+                    contato: true,
+                    cep: true,
+                    estado: true,
+                    cidade: true,
+                    rua: true,
+                    valor_min: true,
+                    valor_max: true,
+                    cargaHoraria_inicio: true,
+                    cargaHoraria_fim: true,
+                    descricao: true,
+                    foto_perfil: true,
                 }
             })
             if (!usuario) return res.status(404).send("Usuário não existe!")
             return res.json(usuario)
         }
-        catch (e) {
-            console.log(e)
+        catch (error) {
+            next(error);
         }
     }
 

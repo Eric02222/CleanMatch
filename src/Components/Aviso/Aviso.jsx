@@ -1,28 +1,26 @@
-import WarningIcon from '../../assets/icons/warning.svg';
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 function Aviso() {
   return (
-<div className="
-    flex items-center justify-center
-    bg-[rgb(245,255,245)]
-    shadow-[0_2px_5px_rgba(0,0,0,0.1)]
-    border-2 border-[#d6da10]
-    rounded-[8px]
-
-    w-[90%]          /* MOBILE: ocupa 90% da largura da tela */
-    max-w-[550px]    /* DESKTOP: não passa de 550px */
-    h-auto           /* altura automática para textos maiores */
-    min-h-[45px]     /* altura mínima igual à antiga */
-
-    px-4 py-2        /* padding responsivo */
-    gap-3
-">
-    <img className="w-[22px] h-[22px]" src={WarningIcon} alt="icone-aviso" />
-
-    <p className="text-[17px] sm:text-[16px] md:text-[18px] font-bold text-center">
-        Por favor, preencha todas as suas informações de perfil
-    </p>
-</div>
+    <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-2xl p-4 gap-4 shadow-sm max-w-2xl mx-auto">
+        <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-100 rounded-xl text-amber-600">
+                <HiOutlineExclamationCircle className="text-2xl" />
+            </div>
+            <div>
+                <h4 className="font-bold text-amber-900 text-sm">Perfil Incompleto</h4>
+                <p className="text-amber-700 text-xs font-medium">
+                    Algumas informações estão faltando. Preencha seu perfil para aparecer nas buscas!
+                </p>
+            </div>
+        </div>
+        <button 
+            onClick={() => window.location.href='/Perfil'}
+            className="btn-warning !h-10 !px-4 !text-[10px] !rounded-xl uppercase tracking-widest shrink-0"
+        >
+            <span>Completar agora</span>
+        </button>
+    </div>
   )
 }
 

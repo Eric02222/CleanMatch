@@ -51,4 +51,22 @@ authRouter.post(
   authController.refresh
 );
 
+authRouter.post(
+  "/forgot-password",
+  /* 
+    #swagger.tags = ['Autenticação']
+    #swagger.summary = 'Envia um email de recuperação de senha'
+  */
+  authController.forgotPassword
+);
+
+authRouter.post(
+  "/reset-password",
+  /* 
+    #swagger.tags = ['Autenticação']
+    #swagger.summary = 'Redefine a senha do usuário usando um token'
+  */
+  authController.resetPassword
+);
+
 export default authRouter;

@@ -1,16 +1,22 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { HiUserAdd } from "react-icons/hi";
 
-function Botao_cadastro() {
-  const navigate = useNavigate()
-  
-      const irPgCadastro = () => {
-          navigate("/Cadastro")
-  
-      };
-  
-      return (
-          <button onClick={irPgCadastro} className="bg-[rgba(255,255,255,0.3)] border border-white text-black px-[15px] py-[8px] rounded-[5px] cursor-pointer text-[1em] font-bold transition-all duration-300 hover:bg-white hover:text-black hover:border-white">Cadastro</button>
-      )
+export function Botao_cadastro() {
+    const navigate = useNavigate();
+
+    const irPgCadastro = () => {
+        navigate("/Cadastro");
+    };
+
+    return (
+        <button 
+            onClick={irPgCadastro} 
+            className="btn-primary !h-11 px-4 sm:!px-6 !rounded-xl !text-sm shadow-brand-primary/20 flex items-center gap-2"
+        >
+            <HiUserAdd className="text-2xl" />
+            <span className="font-black hidden sm:inline">Cadastrar</span>
+        </button>
+    );
 }
 
-export default Botao_cadastro
+export default Botao_cadastro;

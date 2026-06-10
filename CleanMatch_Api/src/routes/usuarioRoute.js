@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { usuarioController } from '../controller/Usuario/UsuarioController.js';
+import { auth } from '../middleware/auth.js';
 
 export const usuarioRouter = Router();
 
@@ -15,6 +16,7 @@ usuarioRouter.get(
 
 usuarioRouter.get(
     "/usuarios/byemail",
+    auth,
     /*
       #swagger.tags = ['Usuários']
       #swagger.summary = 'Busca usuário pelo e-mail'
@@ -45,6 +47,7 @@ usuarioRouter.get(
 
 usuarioRouter.post(
     "/usuarios",
+    auth,
     /*
       #swagger.tags = ['Usuários']
       #swagger.summary = 'Cria um novo usuário'
@@ -55,6 +58,7 @@ usuarioRouter.post(
 
 usuarioRouter.put(
     "/usuarios/:id",
+    auth,
     /*
       #swagger.tags = ['Usuários']
       #swagger.summary = 'Atualiza um usuário pelo ID'
@@ -65,6 +69,7 @@ usuarioRouter.put(
 
 usuarioRouter.delete(
     "/usuarios/:id",
+    auth,
     /*
       #swagger.tags = ['Usuários']
       #swagger.summary = 'Deleta um usuário pelo ID'

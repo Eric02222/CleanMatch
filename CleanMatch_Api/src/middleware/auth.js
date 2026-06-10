@@ -10,8 +10,11 @@ export function auth(req, res, next) {
         if (!payload) return res.status(401).json(
             { error: "invalid token" }
         );
+        
+        // Attach the user payload to the request object
+        req.user = payload;
         next();
-    } catch {
+    } catch (error) {
         return res.status(401).json({ error: "invalid or expired token" });
     }
 }

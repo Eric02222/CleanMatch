@@ -1,13 +1,17 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { toast } from 'react-toastify';
+import api from '../services/api';
 
 const AuthContext = createContext()
-
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    
+
+    const logout = useCallback(() => {
+        localStorage.removeItem("user");
+        setUser(null);
+    }, []);
 
     useEffect(() => {
         const carregarUsuarioArmazenado = () => {
@@ -17,12 +21,13 @@ export const AuthProvider = ({ children }) => {
                 try {
                     const parsedUser = JSON.parse(storedUser);
                     setUser(parsedUser);
+                    // Optionally verify token validity here
                 } catch (error) {
                     console.error("Erro ao ler dados do usuário:", error);
                     localStorage.removeItem("user"); 
                 }
             }
-            setLoading(false); // Terminou de carregar
+            setLoading(false);
         };
 
         carregarUsuarioArmazenado();
@@ -30,22 +35,21 @@ export const AuthProvider = ({ children }) => {
 
     const login = (userData) => {
         localStorage.setItem("user", JSON.stringify(userData));
-        setUser( userData )
-    }
+        setUser(userData);
+    };
 
-    const logout = () => {
-        toast.success("Voce saiu de sua conta", {
+    const handleLogout = () => {
+        logout();
+        toast.success("Você saiu de sua conta", {
             autoClose: 3000,
             hideProgressBar: true,
             pauseOnHover: false
-        })
-        localStorage.removeItem("user")
-        setUser(null)
-    }
+        });
+    };
 
     return (
-        <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
-            {children}
+        <AuthContext.Provider value={{ user, setUser, login, logout: handleLogout, loading }}>
+            {!loading && children}
         </AuthContext.Provider>
     )
 }

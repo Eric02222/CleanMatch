@@ -1,41 +1,134 @@
     import bcrypt from "bcrypt";
+    import crypto from "crypto";
     import { prismaClient } from "../../../prisma/prisma.js";
     import {
         signAccessToken,
         signRefreshToken,
         verifyRefresh,
     } from "../../utils/jwt.js";
+    import { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema } from "../../utils/validations.js";
+    import { sendResetPasswordEmail } from "../../utils/mail.js";
 
 
     class AuthController {
         constructor() { }
 
-        async register(
-            req,
-            res
-        ) {
+        async forgotPassword(req, res, next) {
             try {
-                const { nome, email, senha, tipo_conta, contato = "", cep = "", estado = "", cidade = "", rua = "", valor_min = "", valor_max = "", cargaHoraria_inicio = '', cargaHoraria_fim = '', descricao = "", foto_perfil = 'teste' } = req.body;
-                // Validação básica
-                if (!email || !senha) {
-                    return res.status(400).json({ error: "Email e senha são obrigatórios" });
+                const { email } = forgotPasswordSchema.parse(req.body);
+
+                const usuario = await prismaClient.usuario.findUnique({ where: { email } });
+                
+                // For security, always respond with success even if email doesn't exist
+                if (!usuario) {
+                    return res.status(200).json({ message: "Se o email estiver cadastrado, você receberá um link de recuperação." });
                 }
-                // Verificar se usuário já existe
+
+                // Generate reset token
+                const resetToken = crypto.randomBytes(32).toString("hex");
+                const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+                const expiresAt = new Date();
+                expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour expiration
+
+                // Store in database
+                await prismaClient.token.create({
+                    data: {
+                        token: hashedToken,
+                        type: "reset",
+                        usuarioId: usuario.id,
+                        expiresAt,
+                    },
+                });
+
+                // Send email
+                await sendResetPasswordEmail(email, resetToken);
+
+                return res.status(200).json({ message: "Se o email estiver cadastrado, você receberá um link de recuperação." });
+            } catch (error) {
+                if (error.name === "ZodError") {
+                    return res.status(400).json({ error: error.errors[0].message });
+                }
+                next(error);
+            }
+        };
+
+        async resetPassword(req, res, next) {
+            try {
+                const { token, novaSenha } = resetPasswordSchema.parse(req.body);
+                const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+                const storedToken = await prismaClient.token.findFirst({
+                    where: {
+                        token: hashedToken,
+                        type: "reset",
+                        revoked: false,
+                        expiresAt: { gt: new Date() }
+                    },
+                    include: { usuario: true }
+                });
+
+                if (!storedToken) {
+                    return res.status(400).json({ error: "Token inválido ou expirado" });
+                }
+
+                // Update password
+                const saltRounds = 10;
+                const hashedSenha = await bcrypt.hash(novaSenha, saltRounds);
+
+                await prismaClient.usuario.update({
+                    where: { id: storedToken.usuarioId },
+                    data: { senha: hashedSenha }
+                });
+
+                // Revoke token after use
+                await prismaClient.token.update({
+                    where: { id: storedToken.id },
+                    data: { revoked: true }
+                });
+
+                return res.status(200).json({ message: "Senha alterada com sucesso!" });
+            } catch (error) {
+                if (error.name === "ZodError") {
+                    return res.status(400).json({ error: error.errors[0].message });
+                }
+                next(error);
+            }
+        };
+
+        async register(req, res, next) {
+            try {
+                const validatedData = registerSchema.parse(req.body);
+                const { senha, email, ...otherData } = validatedData;
+
                 const existingUser = await prismaClient.usuario.findUnique({
                     where: { email },
                 });
+                
                 if (existingUser) {
                     return res.status(409).json({ error: "Usuário já existe" });
                 }
-                console.log(senha)
 
-                // Hash da senha com bcrypt
                 const saltRounds = 10;
                 const hashedsenha = await bcrypt.hash(senha, saltRounds);
-                console.log(hashedsenha)
-                // Criar usuário no banco de dados
+
                 const usuario = await prismaClient.usuario.create({
-                    data: { nome: nome, email: email, senha: hashedsenha, tipo_conta: tipo_conta, contato: contato, cep: cep, estado: estado, cidade: cidade,rua: rua,  valor_min:valor_min, valor_max: valor_max, cargaHoraria_inicio: cargaHoraria_inicio, cargaHoraria_fim: cargaHoraria_fim, descricao: descricao, foto_perfil: foto_perfil || null },
+                    data: { 
+                        ...otherData,
+                        email, 
+                        senha: hashedsenha,
+                        contato: otherData.contato || "",
+                        cep: otherData.cep || "",
+                        estado: otherData.estado || "",
+                        cidade: otherData.cidade || "",
+                        rua: otherData.rua || "",
+                        valor_min: otherData.valor_min || "",
+                        valor_max: otherData.valor_max || "",
+                        cargaHoraria_inicio: otherData.cargaHoraria_inicio || "",
+                        cargaHoraria_fim: otherData.cargaHoraria_fim || "",
+                        descricao: otherData.descricao || "",
+                        foto_perfil: otherData.foto_perfil || null
+                    },
                     select: {
                         id: true,
                         email: true,
@@ -56,38 +149,36 @@
                 });
                 return res.status(201).json(usuario);
             } catch (error) {
-                console.error("Erro no registro:", error);
-                res.status(500).json({ error: "Erro interno do servidor" });
+                if (error.name === "ZodError") {
+                    return res.status(400).json({ error: error.errors[0].message });
+                }
+                next(error);
             }
-            return res.status(400).send("Not Found");
         };
 
-        async login(req, res) {
+        async login(req, res, next) {
             try {
-                const { email, senha } = req.body;
-                const usuario = await prismaClient.usuario.findUnique({ where: { email } }); // Verificar se usuário existe e senha está correta
+                const { email, senha } = loginSchema.parse(req.body);
+
+                const usuario = await prismaClient.usuario.findUnique({ where: { email } });
+                
                 if (!usuario || !(await bcrypt.compare(senha, usuario.senha))) {
                     return res.status(401).json({ error: "Credenciais inválidas" });
                 }
-                // Gerar access token (curta duração)
-                const accessToken = signAccessToken({
-                    usuarioId: usuario.id,
+
+                const userPayload = {
+                    id: usuario.id,
                     email: usuario.email,
                     nome: usuario.nome,
+                    tipo_conta: usuario.tipo_conta
+                };
 
-                });
+                const accessToken = signAccessToken(userPayload);
+                const refreshToken = signRefreshToken(userPayload);
 
-                // Gerar refresh token (longa duração)
-                const refreshToken = signRefreshToken({
-                    usuarioId: usuario.id,
-                    email: usuario.email,
-                    nome: usuario.nome,
-
-                });
-                // Armazenar refresh token no banco de dados
                 const expiresAt = new Date();
                 expiresAt.setDate(expiresAt.getDate() + 7);
-                console.log(refreshToken)
+
                 await prismaClient.token.create({
                     data: {
                         token: refreshToken,
@@ -96,78 +187,75 @@
                         expiresAt,
                     },
                 });
+
+                const { senha: _, ...userWithoutPassword } = usuario;
+
                 res.status(200).json({
                     accessToken,
                     refreshToken,
-                    usuario: {
-                        usuarioId: usuario.id,
-                        email: usuario.email,
-                        nome: usuario.nome,
-
-                    },
+                    usuario: userWithoutPassword
                 });
             } catch (error) {
-                console.error("Erro no login:", error);
-                res.status(500).json({ error: "Erro interno do servidor" });
-            }
-            return res;
-        };
-
-
-        async refresh(
-            req,
-            res
-        ) {
-            const { refreshToken } = req.body;
-            const storedRefreshToken = await prismaClient.token.findFirst({
-                where: { token: refreshToken },
-            });
-            if (
-                !storedRefreshToken ||
-                storedRefreshToken.revoked ||
-                storedRefreshToken.expiresAt < new Date()
-            )
-                return res.status(401).json({ error: "invalid refresh token" });
-
-            try {
-                const payload = verifyRefresh(refreshToken);
-                const accessToken = signAccessToken({
-                    userId: payload.id,
-                    email: payload.email,
-                    nome: payload.nome,
-                });
-                return res.json({ accessToken });
-            } catch {
-                return res.status(401).json({ error: "invalid refresh token" });
+                if (error.name === "ZodError") {
+                    return res.status(400).json({ error: error.errors[0].message });
+                }
+                next(error);
             }
         };
 
-        async logout(
-            req,
-            res
-        ) {
-            const { refreshToken } = req.body;
-            console.log(refreshToken)
+
+        async refresh(req, res, next) {
             try {
+                const { refreshToken } = req.body;
+                if (!refreshToken) return res.status(400).json({ error: "Refresh token is required" });
+
                 const storedRefreshToken = await prismaClient.token.findFirst({
                     where: { token: refreshToken },
+                    include: { usuario: true }
                 });
-                console.log(storedRefreshToken)
+
                 if (
                     !storedRefreshToken ||
                     storedRefreshToken.revoked ||
                     storedRefreshToken.expiresAt < new Date()
-                )
-                    return res.status(401).json({ error: "invalid refresh token" });
-                await prismaClient.token.updateMany({
-                    where: { id: storedRefreshToken?.id ?? 0 },
-                    data: { revoked: true },
-                });
-                console.log("teste")
-                return res.status(200).json("Usuário deslogado!");
+                ) {
+                    return res.status(401).json({ error: "Invalid or expired refresh token" });
+                }
 
+                const payload = verifyRefresh(refreshToken);
+                const userPayload = {
+                    id: storedRefreshToken.usuario.id,
+                    email: storedRefreshToken.usuario.email,
+                    nome: storedRefreshToken.usuario.nome,
+                    tipo_conta: storedRefreshToken.usuario.tipo_conta
+                };
+
+                const accessToken = signAccessToken(userPayload);
+                return res.json({ accessToken });
             } catch (error) {
-                res.status(400).json(error)
+                next(error);
+            }
+        };
+
+        async logout(req, res, next) {
+            try {
+                const { refreshToken } = req.body;
+                if (!refreshToken) return res.status(400).json({ error: "Refresh token is required" });
+
+                const storedRefreshToken = await prismaClient.token.findFirst({
+                    where: { token: refreshToken },
+                });
+
+                if (storedRefreshToken) {
+                    await prismaClient.token.update({
+                        where: { id: storedRefreshToken.id },
+                        data: { revoked: true },
+                    });
+                }
+                
+                return res.status(200).json({ message: "Usuário deslogado!" });
+            } catch (error) {
+                next(error);
             }
         }
     }

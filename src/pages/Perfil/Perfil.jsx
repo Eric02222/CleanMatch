@@ -4,15 +4,13 @@ import { formatPhoneNumber, formatCepNumber, validarEmail, formatCurrency } from
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import api from '../../services/api';
 import Foto_de_perfil from '../../Components/FotoPerfil/FotoPerfil.jsx';
+import { HiPencilAlt, HiTrash, HiSave, HiX, HiLocationMarker, HiClock, HiCurrencyDollar, HiIdentification } from "react-icons/hi";
 
 function Perfil() {
   const { user, setUser } = useAuth()
   const navigate = useNavigate();
-
-  // Extrai o token com segurança
-  const token = user?.token;
 
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -24,7 +22,6 @@ function Perfil() {
   const [displayContato, setDisplayContato] = useState('');
   const [displayCep, setDisplayCep] = useState('');
 
-  // Carrega os dados do usuário nos estados locais
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {
       setAccountData(user);
@@ -34,12 +31,13 @@ function Perfil() {
     }
   }, [user]);
 
-  // Proteção: Se user for null (ainda carregando ou não logado)
   if (!user) {
     return (
-      <div className="container-perfil" style={{ padding: '20px', textAlign: 'center' }}>
-        <h2>Carregando perfil...</h2>
-        <p>Se demorar muito, por favor faça login novamente.</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+            <p className="font-bold text-slate-500">Carregando seu perfil...</p>
+        </div>
       </div>
     );
   }
@@ -58,16 +56,9 @@ function Perfil() {
             estado: data.uf,
             cidade: data.localidade,
             rua: data.logradouro
-
           }));
         } else {
           toast.error('CEP não encontrado.', { autoClose: 3000 });
-          setAccountData((prevData) => ({
-            ...prevData,
-            estado: '',
-            cidade: '',
-            rua: '',
-          }));
         }
       } catch (error) {
         toast.error('Erro ao buscar CEP.');
@@ -78,29 +69,14 @@ function Perfil() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    let finalValue = value;
-
-    if (name === 'valor_min' || name === 'valor_max') {
-      finalValue = value === '' ? 0 : Number(value);
-    }
-
-    setAccountData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setAccountData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleContactChange = (e) => {
     const rawValue = e.target.value;
     const cleanedValue = rawValue.replace(/\D/g, '');
     const formattedValue = formatPhoneNumber(rawValue);
-
-    setAccountData((prevData) => ({
-      ...prevData,
-      contato: cleanedValue,
-    }));
-
+    setAccountData((prevData) => ({ ...prevData, contato: cleanedValue }));
     setDisplayContato(formattedValue);
   };
 
@@ -108,28 +84,16 @@ function Perfil() {
     const rawValue = e.target.value;
     const cleanedValue = rawValue.replace(/\D/g, '');
     const formattedValue = formatCepNumber(rawValue);
-
-    setAccountData((prevData) => ({
-      ...prevData,
-      cep: cleanedValue,
-    }));
+    setAccountData((prevData) => ({ ...prevData, cep: cleanedValue }));
     setDisplayCep(formattedValue);
-
-    if (cleanedValue.length === 8) {
-      fetchAddressByCep(cleanedValue);
-    }
+    if (cleanedValue.length === 8) fetchAddressByCep(cleanedValue);
   };
 
   const handleMoneyChange = (e) => {
     const { name, value } = e.target;
-
     const onlyDigits = value.replace(/\D/g, '');
     const numericValue = Number(onlyDigits) / 100;
-
-    setAccountData((prevData) => ({
-      ...prevData,
-      [name]: numericValue,
-    }));
+    setAccountData((prevData) => ({ ...prevData, [name]: numericValue }));
   };
 
   const handleEditClick = () => {
@@ -144,16 +108,8 @@ function Perfil() {
     setDisplayCep(formatCepNumber(originalAccountData.cep || ''));
   };
 
-  const handleSaveClick = () => {
-    setShowSaveModal(true);
-  };
-
   const confirmSave = async (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
+    if (e) e.preventDefault();
     try {
       if (!accountData.email || !validarEmail(accountData.email)) {
         toast.error('Email inválido');
@@ -163,51 +119,31 @@ function Perfil() {
 
       const dadosParaEnviar = {
         ...accountData,
-
         valor_min: Number(accountData.valor_min || 0).toFixed(2),
         valor_max: Number(accountData.valor_max || 0).toFixed(2),
-
         contato: accountData.contato?.toString().replace(/\D/g, '') || "",
         cep: accountData.cep?.toString().replace(/\D/g, '') || "",
       };
 
-      console.log("Enviando:", dadosParaEnviar);
+      await api.put(`/usuarios/${user.id}`, dadosParaEnviar);
 
-      await axios.put(`http://localhost:4000/usuarios/${user.id}`, dadosParaEnviar, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-
-      setUser({ ...dadosParaEnviar, token: token });
-      localStorage.setItem("user", JSON.stringify({ ...dadosParaEnviar, token: token }));
+      const updatedUser = { ...dadosParaEnviar, token: user.token };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
       setIsEditing(false);
       setShowSaveModal(false);
-      toast.success('Dados salvos com sucesso!');
+      toast.success('Perfil atualizado com sucesso!');
       setOriginalAccountData(dadosParaEnviar);
-
     } catch (error) {
       toast.error('Erro ao salvar dados.');
-      console.error('Erro ao salvar:', error);
     }
-  };
-
-  const cancelSave = () => {
-    setShowSaveModal(false);
-  };
-
-  const handleDeleteClick = () => {
-    setShowDeleteModal(true);
   };
 
   const confirmDelete = async (e) => {
     if (e) e.preventDefault();
     try {
-
-      await axios.delete(`http://localhost:4000/usuarios/${user.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
+      await api.delete(`/usuarios/${user.id}`);
       setUser(null);
       setShowDeleteModal(false);
       localStorage.removeItem("user");
@@ -215,12 +151,7 @@ function Perfil() {
       toast.success('Conta excluída com sucesso!');
     } catch (error) {
       toast.error('Erro ao excluir conta.');
-      console.error(error);
     }
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
   };
 
   const handleTypeChange = (e) => {
@@ -228,7 +159,7 @@ function Perfil() {
     setAccountData((prevData) => ({
       ...prevData,
       tipo_conta: newType,
-      ...(newType === 'Cliente' && {
+      ...(newType === 'CLIENTE' && {
         cargaHoraria_inicio: "",
         cargaHoraria_fim: "",
         valor_max: "",
@@ -239,281 +170,198 @@ function Perfil() {
   };
 
   return (
-    <div className="flex flex-col text-[rgb(248,241,241)] font-sans pt-[55px]">
+    <div className="min-h-screen bg-slate-50 pt-28 pb-20 px-4 md:px-8">
+      <div className="max-w-5xl mx-auto space-y-8">
+        
+        {/* HEADER PROFILE CARD */}
+        <div className="bg-brand-primary rounded-[40px] p-8 md:p-12 text-white shadow-2xl shadow-brand-primary/20 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+            
+            <div className="relative flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                <div className="relative group">
+                    <Foto_de_perfil />
+                    <div className="absolute inset-0 rounded-full border-4 border-white/20 scale-110"></div>
+                </div>
 
-      {/* SEÇÃO DO PERFIL */}
-      <div className="
-      flex flex-col md:flex-row 
-      bg-[#20c997] 
-      w-full 
-      items-center md:items-start 
-      justify-center md:justify-start 
-      gap-6 md:gap-[90px] 
-      pt-6 md:pt-[2vh] 
-      px-6 md:pl-[7vw] 
-      shadow-[0_2px_5px_rgba(0,0,0,0.1)]
-      h-auto md:h-[65vh]
-  ">
+                <div className="text-center md:text-left space-y-4">
+                    <div className="space-y-1">
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur rounded-full text-[10px] font-black uppercase tracking-widest">
+                            {accountData?.tipo_conta}
+                        </span>
+                        <h1 className="text-4xl md:text-5xl font-black tracking-tight">{accountData?.nome}</h1>
+                    </div>
+                    
+                    <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 text-white/80 font-medium">
+                        <div className="flex items-center gap-2">
+                            <HiLocationMarker className="text-white" />
+                            <span>{accountData?.cidade || 'Localização não definida'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <HiIdentification className="text-white" />
+                            <span>{accountData?.email}</span>
+                        </div>
+                    </div>
 
-        {/* FOTO */}
-        <div className="w-[150px] h-[150px] md:w-auto md:h-auto flex-shrink-0">
-          <Foto_de_perfil />
+                    <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+                        {!isEditing ? (
+                            <button onClick={handleEditClick} className="btn-info px-8 !shadow-blue-500/20 hover:scale-105 transition-all flex items-center gap-2">
+                                <HiPencilAlt className="text-xl" /> Editar Perfil
+                            </button>
+                        ) : (
+                            <>
+                                <button onClick={() => setShowSaveModal(true)} className="btn-success px-8 !shadow-green-500/20 hover:scale-105 transition-all flex items-center gap-2">
+                                    <HiSave className="text-xl" /> Salvar Alterações
+                                </button>
+                                <button onClick={handleCancelEdit} className="btn-secondary px-8 hover:scale-105 transition-all flex items-center gap-2">
+                                    <HiX className="text-xl" /> Cancelar
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
 
-        {/* INFO DO USUÁRIO */}
-        <div className="text-center md:text-left mt-12 pb-3  md:mt-5">
-          <h2 className="font-bold text-[4vh] md:text-[6vh]">{accountData?.nome}</h2>
-          <p className="text-[18px] md:text-[30px]">
-            <span className="font-bold">Email:</span> {accountData?.email}
-          </p>
+        {/* MAIN CONTENT GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* LEFT COLUMN: ABOUT */}
+            <div className="lg:col-span-2 space-y-8">
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-black text-slate-900">Informações Pessoais</h2>
+                        <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><HiIdentification className="text-xl" /></div>
+                    </div>
 
-          <p className="text-[18px] md:text-[30px]">
-            <span className="font-bold">Contato:</span> {displayContato}
-          </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1.5">
+                            <label className="label">Nome Completo</label>
+                            <input name="nome" className="input-base" value={accountData?.nome || ''} onChange={handleInputChange} readOnly={!isEditing} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="label">E-mail de Contato</label>
+                            <input name="email" className="input-base" value={accountData?.email || ''} onChange={handleInputChange} readOnly={!isEditing} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="label">Telefone / WhatsApp</label>
+                            <input className="input-base" value={displayContato || ''} onChange={handleContactChange} readOnly={!isEditing} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="label">Tipo de Conta</label>
+                            <select className="input-base" value={accountData?.tipo_conta || ''} onChange={handleTypeChange} disabled={!isEditing}>
+                                <option value="CLIENTE">Cliente</option>
+                                <option value="PROFISSIONAL">Profissional</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-          <p className="text-[18px] md:text-[30px]">
-            <span className="font-bold">Estado:</span> {accountData?.estado}
-          </p>
+                {accountData?.tipo_conta === "PROFISSIONAL" && (
+                    <div className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-black text-slate-900">Detalhes do Serviço</h2>
+                            <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><HiClock className="text-xl" /></div>
+                        </div>
 
-          <p className="text-[18px] md:text-[30px]">
-            <span className="font-bold">Cidade:</span> {accountData?.cidade}
-          </p>
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-1.5">
+                                    <label className="label">Disponibilidade (Início)</label>
+                                    <input type="time" name="cargaHoraria_inicio" className="input-base" value={accountData?.cargaHoraria_inicio || ''} onChange={handleInputChange} readOnly={!isEditing} />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="label">Disponibilidade (Fim)</label>
+                                    <input type="time" name="cargaHoraria_fim" className="input-base" value={accountData?.cargaHoraria_fim || ''} onChange={handleInputChange} readOnly={!isEditing} />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="label">Preço Mínimo /h</label>
+                                    <input className="input-base" value={formatCurrency(accountData?.valor_min)} onChange={handleMoneyChange} name="valor_min" readOnly={!isEditing} />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="label">Preço Máximo /h</label>
+                                    <input className="input-base" value={formatCurrency(accountData?.valor_max)} onChange={handleMoneyChange} name="valor_max" readOnly={!isEditing} />
+                                </div>
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="label">Descrição Profissional</label>
+                                <textarea name="descricao" className="input-base min-h-[120px] resize-none" placeholder="Conte um pouco sobre sua experiência e serviços..." value={accountData?.descricao || ''} onChange={handleInputChange} readOnly={!isEditing} />
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
 
-          {accountData?.tipo_conta === 'Prestador/a de Serviço' && (
-            <>
-              <p className="text-[18px] md:text-[30px]"><span className="font-bold">Horario:</span> {accountData?.cargaHoraria_inicio} - {accountData?.cargaHoraria_fim}</p>
-              <p className="text-[18px] md:text-[30px]"> <span className="font-bold">Faixa de Preço:</span> {formatCurrency(accountData?.valor_min)} - {formatCurrency(accountData?.valor_max)}</p>
-            </>
-          )}
+            {/* RIGHT COLUMN: LOCATION & ACTIONS */}
+            <div className="space-y-8">
+                <div className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-black text-slate-900">Localização</h2>
+                        <div className="p-2 bg-slate-50 rounded-lg text-slate-400"><HiLocationMarker className="text-xl" /></div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                        <div className="space-y-1.5">
+                            <label className="label">CEP</label>
+                            <input className="input-base" value={displayCep || ''} onChange={handleCepChange} readOnly={!isEditing} maxLength="9" />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="label">Estado</label>
+                            <input name="estado" className="input-base" value={accountData?.estado || ''} onChange={handleInputChange} readOnly={!isEditing} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="label">Cidade</label>
+                            <input name="cidade" className="input-base" value={accountData?.cidade || ''} onChange={handleInputChange} readOnly={!isEditing} />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="label">Rua / Bairro</label>
+                            <input name="rua" className="input-base" value={accountData?.rua || ''} onChange={handleInputChange} readOnly={!isEditing} />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-red-50 rounded-[32px] p-8 border border-red-100">
+                    <h3 className="text-lg font-black text-red-900 mb-2">Zona de Perigo</h3>
+                    <p className="text-red-700 text-sm font-medium mb-6">Ao excluir sua conta, todos os seus dados serão removidos permanentemente.</p>
+                    <button onClick={() => setShowDeleteModal(true)} className="w-full py-4 bg-red-500 text-white rounded-2xl font-black shadow-lg shadow-red-500/20 hover:bg-red-600 transition-all flex items-center justify-center gap-2">
+                        <HiTrash /> Excluir Conta
+                    </button>
+                </div>
+            </div>
         </div>
       </div>
 
-      {/* FORMULÁRIO DE DETALHES */}
-      <div className="
-      grid 
-      grid-cols-1 sm:grid-cols-2 
-      mx-auto my-8 
-      text-[#0d0d0d] 
-      gap-y-6 gap-x-10 
-      w-[90vw] sm:w-[85vw] md:w-[80vw] 
-      p-6 
-      bg-[#fefefe] 
-      rounded-[8px] 
-      shadow-[0_4px_10px_rgba(0,0,0,0.1)]
-  ">
-
-        <div className="col-span-full text-center mb-4">
-          <h1 className="text-[28px] md:text-[40px]">Detalhes da Conta</h1>
+      {/* MODALS */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-box !max-w-md">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <HiTrash className="text-3xl" />
+            </div>
+            <h3 className="text-2xl font-black text-slate-900 mb-2">Confirmar Exclusão</h3>
+            <p className="text-slate-500 font-medium mb-8">Esta ação não pode ser desfeita. Tem certeza que deseja deletar sua conta permanentemente?</p>
+            <div className="flex gap-4 w-full">
+              <button onClick={confirmDelete} className="flex-1 btn-danger">Sim, Deletar</button>
+              <button onClick={() => setShowDeleteModal(false)} className="flex-1 btn-secondary border-slate-200 text-slate-600">Cancelar</button>
+            </div>
+          </div>
         </div>
+      )}
 
-        {/* CAMPO - REAPROVEITADO POR TODOS OS INPUTS */}
-        {[
-          {
-            id: "tipo_conta",
-            label: "Tipo de Conta:",
-            element: (
-              <select
-                id="tipo_conta"
-                className="input-base"
-                value={accountData?.tipo_conta || ''}
-                onChange={handleTypeChange}
-                disabled={!isEditing}
-              >
-                <option value="Cliente">Cliente</option>
-                <option value="Prestador/a de Serviço">Prestador/a de Serviço</option>
-              </select>
-            )
-          },
-          {
-            id: "nome",
-            label: "Nome:",
-            element: (
-              <input
-                type="text"
-                name="nome"
-                id="nome_detalhes"
-                className="input-base"
-                value={accountData?.nome || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
-            )
-          },
-          {
-            id: "email",
-            label: "E-mail:",
-            element: (
-              <input
-                type="email"
-                name="email"
-                id="email"
-                className="input-base"
-                value={accountData?.email || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
-            )
-          },
-          {
-            id: "contato",
-            label: "Contato:",
-            element: (
-              <input
-                type="text"
-                name='contato'
-                id="contato"
-                className="input-base"
-                value={displayContato || ''}
-                onChange={handleContactChange}
-                readOnly={!isEditing}
-                maxLength="15"
-              />
-            )
-          },
-          {
-            id: "cep",
-            label: "CEP:",
-            element: (
-              <input
-                id="cep"
-                name='cep'
-                className="input-base"
-                value={displayCep || ''}
-                onChange={handleCepChange}
-                readOnly={!isEditing}
-                maxLength="9"
-              />
-            )
-          },
-          {
-            id: "estado",
-            label: "Estado:",
-            element: (
-              <input
-                id="estado"
-                name='estado'
-                className="input-base"
-                value={accountData?.estado || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
-            )
-          },
-          {
-            id: "cidade",
-            label: "Cidade:",
-            element: (
-              <input
-                id="cidade"
-                name='cidade'
-                className="input-base"
-                value={accountData?.cidade || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
-            )
-          },
-          {
-            id: "rua",
-            label: "Rua:",
-            element: (
-              <input
-                id="rua"
-                name='rua'
-                className="input-base"
-                value={accountData?.rua || ''}
-                onChange={handleInputChange}
-                readOnly={!isEditing}
-              />
-            )
-          }
-        ].map((field) => (
-          <div key={field.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 pr-2">
-            <label className="text-[16px] md:text-[18px] font-bold sm:mr-[10px] w-full sm:w-[250px]">
-              {field.label}
-            </label>
-            {field.element}
+      {showSaveModal && (
+        <div className="modal-overlay">
+          <div className="modal-box !max-w-md">
+            <div className="w-16 h-16 bg-brand-primary/10 text-brand-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                <HiSave className="text-3xl" />
+            </div>
+            <h3 className="text-2xl font-black text-slate-900 mb-2">Salvar Alterações?</h3>
+            <p className="text-slate-500 font-medium mb-8">Deseja atualizar seu perfil com as novas informações fornecidas?</p>
+            <div className="flex gap-4 w-full">
+              <button onClick={confirmSave} className="flex-1 btn-primary">Sim, Salvar</button>
+              <button onClick={() => setShowSaveModal(false)} className="flex-1 btn-secondary border-slate-200 text-slate-600">Continuar Editando</button>
+            </div>
           </div>
-        ))}
-
-        {/* CAMPOS EXTRAS PARA PRESTADOR */}
-        {accountData?.tipo_conta === "Prestador/a de Serviço" && (
-          <>
-            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pr-2">
-              <label className="label" id="cargaHoraria_inicio">Carga Horária Início:</label>
-              <input type="time" name='cargaHoraria_inicio' id="cargaHoraria_inicio" className="input-base " value={accountData?.cargaHoraria_inicio || ''} onChange={handleInputChange} readOnly={!isEditing} />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pr-2">
-              <label className="label" id="cargaHoraria_fim">Carga Horária Fim:</label>
-              <input type="time" name='cargaHoraria_fim' id="cargaHoraria_fim" className="input-base" value={accountData?.cargaHoraria_fim || ''} onChange={handleInputChange} readOnly={!isEditing} />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pr-2">
-              <label className="label" id='valor_min'>Valor Mínimo:</label>
-              <input id="valor_min" name="valor_min" className="input-base" value={formatCurrency(accountData?.valor_min)} onChange={handleMoneyChange} readOnly={!isEditing} maxLength="18" />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pr-2">
-              <label className="label" id='valor_max'>Valor Máximo:</label>
-              <input id="valor_max" name='valor_max' className="input-base" value={formatCurrency(accountData?.valor_max)} onChange={handleMoneyChange} readOnly={!isEditing} maxLength="18" />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-start justify-end gap-2 pr-2">
-              <label className="label" id='descricao'>Descrição:</label>
-              <textarea id="descricao" name='descricao' maxLength="500" className="input-base min-h-[80px]" value={accountData?.descricao || ''} onChange={handleInputChange} readOnly={!isEditing} />
-            </div>
-          </>
-        )}
-
-        {/* BOTÕES */}
-        <div className="col-span-full flex flex-wrap items-center justify-center gap-6 py-4">
-
-          {!isEditing ? (
-            <>
-              <button onClick={handleEditClick} className="btn-primary w-[120px]">Editar</button>
-              <button onClick={handleDeleteClick} className="btn-danger px-5 py-2 min-w-[140px]">Excluir Conta</button>
-            </>
-          ) : (
-            <>
-              <button onClick={handleSaveClick} className="btn-primary w-[150px] ">Salvar Edição</button>
-              <button onClick={handleCancelEdit} className="btn-danger w-[180px]">Cancelar Edição</button>
-            </>
-          )}
-
         </div>
-
-        {/* MODAIS */}
-        {/* (não modifiquei—funcionam em todas telas automaticamente) */}
-        {showDeleteModal && (
-          <div className="modal-overlay">
-            <div className="modal-box">
-              <h3>Confirmar Exclusão</h3>
-              <p>Tem certeza que deseja excluir sua conta?</p>
-              <div className="flex gap-4 pt-4">
-                <button onClick={confirmDelete} className="btn-primary">Sim, Deletar</button>
-                <button onClick={cancelDelete} className="btn-danger">Cancelar</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {showSaveModal && (
-          <div className="modal-overlay">
-            <div className="modal-box">
-              <h3>Salvar Alterações</h3>
-              <p>Deseja salvar as alterações?</p>
-              <div className="flex gap-4 pt-4">
-                <button onClick={confirmSave} className="btn-primary">Sim, Salvar</button>
-                <button onClick={cancelSave} className="btn-danger">Continuar Editando</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-      </div>
+      )}
     </div>
-
   );
 }
 
